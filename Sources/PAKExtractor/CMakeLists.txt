@@ -1,3 +1,5 @@
+project(pak-extractor)
+
 add_executable(${PROJECT_NAME}
   main.cpp
   pak.cpp
@@ -12,7 +14,6 @@ target_link_libraries(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME}
   PROPERTIES CXX_VISIBILITY_PRESET hidden
 )
-
 install(
   TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION bin

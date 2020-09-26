@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(pak-extractor)
+project(dune2-data-toolset)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Scripts/CMake")
 
@@ -13,4 +13,4 @@ conan_setup(
   KEEP_RPATHS
 )
 
-add_subdirectory(Sources)
+add_subdirectory(Sources/PAKExtractor)
