@@ -13,4 +13,5 @@ conan_setup(
   KEEP_RPATHS
 )
 
+add_subdirectory(Sources/Dune2)
 add_subdirectory(Sources/PAKExtractor)

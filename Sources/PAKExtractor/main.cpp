@@ -1,5 +1,7 @@
 #include "pak.hpp"
 
+#include "Dune2/io.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -8,13 +10,6 @@
 
 namespace po = boost::program_options;
 namespace fs = std::filesystem;
-
-std::ostream &
-operator<<(
-    std::ostream &out,
-    const std::function<std::ostream &(std::ostream &)> &s) {
-    return s(out);
-}
 
 int
 main(int argc, char const *argv[]) {

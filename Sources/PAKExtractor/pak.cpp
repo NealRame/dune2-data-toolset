@@ -1,5 +1,7 @@
 #include "pak.hpp"
 
+#include <Dune2/io.hpp>
+
 #include <fstream>
 #include <istream>
 #include <optional>
@@ -8,25 +10,10 @@ namespace std {
 
 namespace {
 
-std::string
-readString(std::istream &in) {
-    char c;
-    std::string name;
-    while (in && (c = in.get()) != '\0') {
-        name.push_back(c);
-    }
-    return name;
-}
-
 uintmax_t
 readOffset(istream &in) {
-    uint32_t offset;
-
-    in.read(((char *)&offset), 4);
-    if (in.gcount() < 4) {
-        offset = 0;
-    }
-
+    using nr::dune2::io::readInteger;
+    const auto offset = readInteger<4, uintmax_t>(in).value_or(0);
     return offset > 0
         ? offset
         : static_cast<uintmax_t>(in.seekg(0, std::ios::end).tellg());
@@ -34,21 +21,21 @@ readOffset(istream &in) {
 } // namespace
 
 std::istream &
-operator>>(std::istream &stream, std::pair<uintmax_t, string> &entry) {
-    if (stream) {
+operator>>(std::istream &in, std::pair<uintmax_t, string> &entry) {
+    if (in) {
         entry = std::make_pair(
-            readOffset(stream),
-            readString(stream)
+            readOffset(in),
+            nr::dune2::io::readString(in)
         );
     }
-    return stream;
+    return in;
 }
 
 std::ostream &
-operator<<(std::ostream &stream, const nr::PAK::Entry &entry) {
+operator<<(std::ostream &out, const nr::PAK::Entry &entry) {
     auto buf = entry.buffer();
-    stream << &buf;
-    return stream;
+    out << &buf;
+    return out;
 }
 } // namespace std
 
