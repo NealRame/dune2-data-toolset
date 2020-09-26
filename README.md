@@ -1,11 +1,13 @@
-PAK file extractor
-==================
+Dune II data toolset
+====================
+
+Provides command line tools to manipulate data from game __Dune II__.
 
 Build
 -----
 
 ```shell
-> cd pak-extractor
+> cd dune2-data-toolset
 > mkdir Build
 > cd Build
 > cmake -DCMAKE_INSTALL_PREFIX="/path/where/to/install/binary" ..
@@ -13,8 +15,10 @@ Build
 > make install
 ```
 
-Usage
------
+PAK extractor
+-------------
+
+Extract data from a _.PAK_ file.
 
 ### Synopsis
 ```
