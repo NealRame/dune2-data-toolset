@@ -57,13 +57,13 @@ main(int argc, char const *argv[]) {
             : vm["input-file"].as<fs::path>().stem();
     };
 
-    const auto list = [&](const nr::PAK &pak) {
+    const auto list = [&](const nr::dune2::PAK &pak) {
         for (const auto &entry: pak) {
             std::cout << entry.name << " " << entry.size << std::endl;
         }
     };
 
-    const auto extract = [&](const nr::PAK &pak) {
+    const auto extract = [&](const nr::dune2::PAK &pak) {
         fs::create_directories(outputDir());
         for (const auto &entry: pak) {
             auto out = std::fstream(
@@ -86,7 +86,7 @@ main(int argc, char const *argv[]) {
 
     if(vm.count("input-file")) {
         const auto filepath = vm["input-file"].as<fs::path>();
-        nr::PAK pak;
+        nr::dune2::PAK pak;
 
         if (pak.load(filepath.string())) {
             if (vm["list"].as<bool>()) {

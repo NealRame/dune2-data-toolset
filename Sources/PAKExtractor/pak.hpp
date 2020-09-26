@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace nr {
+namespace nr::dune2 {
 class PAK {
     struct impl;
     std::unique_ptr<impl> pimpl_;
@@ -50,8 +50,8 @@ public:
     const_iterator cbegin() const;
     const_iterator cend() const;
 };
-} // namespace nr
+} // namespace nr::dune2
 
 namespace std {
-    std::ostream &operator<<(std::ostream &, const nr::PAK::Entry &);
+    std::ostream &operator<<(std::ostream &, const nr::dune2::PAK::Entry &);
 }

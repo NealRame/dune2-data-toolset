@@ -32,14 +32,14 @@ operator>>(std::istream &in, std::pair<uintmax_t, string> &entry) {
 }
 
 std::ostream &
-operator<<(std::ostream &out, const nr::PAK::Entry &entry) {
+operator<<(std::ostream &out, const nr::dune2::PAK::Entry &entry) {
     auto buf = entry.buffer();
     out << &buf;
     return out;
 }
 } // namespace std
 
-namespace nr {
+namespace nr::dune2 {
 
 ///////////////////////////////////////////////////////////////////////////////
 // PAK
@@ -178,4 +178,4 @@ PAK::Entry::buffer() const {
     return EntryBuffer(*this);
 }
 
-} // namespace nr
+} // namespace nr::dune2
