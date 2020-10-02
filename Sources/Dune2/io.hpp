@@ -6,6 +6,15 @@
 
 namespace nr::dune2::io {
 
+class IPosOffsetGuard {
+    std::istream &input_;
+    std::istream::pos_type pos_;
+
+public:
+    IPosOffsetGuard(std::istream &);
+    ~IPosOffsetGuard();
+};
+
 /// readInteger
 /// generic function to read an integer on a input stream
 template<int N, typename IntType = uint32_t>
