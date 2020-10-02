@@ -20,6 +20,21 @@ readInteger(std::istream &input) {
     return value;
 }
 
+// readData
+// read a given amount of data from the input stream and return it in a vector
+template<typename T = std::uint8_t>
+std::vector<T>
+readData(std::istream &input, std::size_t count) {
+    static_assert(std::is_trivial_v<T>, "Trivial type required");
+
+    std::vector<T> buffer(count);
+    const auto data_size = count*sizeof(T);
+
+    input.read(reinterpret_cast<char *>(buffer.data()), data_size);
+
+    return buffer;
+}
+
 std::string readString(std::istream &);
 } // namespace nr::dune2
 
