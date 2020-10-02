@@ -1,44 +1,42 @@
 #pragma once
 
-#include <ostream>
 #include <iterator>
+#include <optional>
+#include <fstream>
 #include <string>
 #include <vector>
 
 namespace nr::dune2 {
 class PAK {
-    struct impl;
-    std::unique_ptr<impl> pimpl_;
-
 public:
     struct Entry;
 
     class EntryBuffer : public std::streambuf {
-        friend class PAK;
-        struct impl;
-        std::unique_ptr<impl> pimpl_;
-
     public:
         EntryBuffer(const Entry &);
 
     protected:
         virtual std::streambuf::int_type underflow() override;
+    
+    private:
+        const std::size_t offset_{0};
+        const std::size_t size_{0};
+        std::size_t pos_;
+        char ch_;
+        std::fstream input_;
     };
 
     struct Entry {
-        const PAK &owner;
-        std::string name;
-        std::uintmax_t offset{0};
-        std::uintmax_t size{0};
+        const std::size_t offset{0};
+        const std::size_t size{0};
+        const std::string name;
+        const std::shared_ptr<std::string> filepath;
+
         EntryBuffer buffer() const;
     };
 
 public:
-    PAK();
-    virtual ~PAK();
-
-public:
-    bool load(const std::string &filepath);
+    static std::optional<PAK> load(const std::string &filepath);
 
 public:
     using const_iterator = std::vector<Entry>::const_iterator;
@@ -49,6 +47,9 @@ public:
 
     const_iterator cbegin() const;
     const_iterator cend() const;
+
+private:
+    std::vector<Entry> entries_;
 };
 } // namespace nr::dune2
 

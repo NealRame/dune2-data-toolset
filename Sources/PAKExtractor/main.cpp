@@ -86,13 +86,13 @@ main(int argc, char const *argv[]) {
 
     if(vm.count("input-file")) {
         const auto filepath = vm["input-file"].as<fs::path>();
-        nr::dune2::PAK pak;
+        const auto pak = nr::dune2::PAK::load(filepath.string());
 
-        if (pak.load(filepath.string())) {
+        if (pak) {
             if (vm["list"].as<bool>()) {
-                list(pak);
+                list(*pak);
             } else {
-                extract(pak);
+                extract(*pak);
             }
         }
     } else {

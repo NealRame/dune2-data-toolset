@@ -5,28 +5,30 @@
 #include <fstream>
 #include <istream>
 #include <optional>
-
-namespace std {
+#include <utility>
 
 namespace {
 
-uintmax_t
-readOffset(istream &in) {
-    using nr::dune2::io::readInteger;
-    const auto offset = readInteger<4, uintmax_t>(in).value_or(0);
-    return offset > 0
-        ? offset
-        : static_cast<uintmax_t>(in.seekg(0, std::ios::end).tellg());
-}
+using PAKRawEntry = std::pair<std::size_t, std::string>;
+
 } // namespace
 
+namespace std {
+
 std::istream &
-operator>>(std::istream &in, std::pair<uintmax_t, string> &entry) {
+operator>>(std::istream &in, PAKRawEntry &entry) {
+    using nr::dune2::io::readInteger;
+    using nr::dune2::io::readString;
     if (in) {
-        entry = std::make_pair(
-            readOffset(in),
-            nr::dune2::io::readString(in)
-        );
+        const auto offset = readInteger<4, PAKRawEntry::first_type>(in);
+        if (offset > 0) {
+            entry = std::make_pair(offset, readString(in));
+        } else {
+            entry = std::make_pair(
+                static_cast<std::size_t>(in.seekg(0, std::ios::end).tellg()),
+                ""
+            );
+        }
     }
     return in;
 }
@@ -43,82 +45,47 @@ namespace nr::dune2 {
 
 ///////////////////////////////////////////////////////////////////////////////
 // PAK
-struct PAK::impl {
-    using RawEntry = std::pair<std::uintmax_t, std::string>;
-    const std::ios::openmode OPEN_MODE = std::ios::binary|std::ios::in;
 
-    const PAK &owner;
-
-    std::shared_ptr<std::fstream> input;
-    std::vector<Entry> entries;
-
-    impl(const PAK &owner)
-        : owner{owner} {
-    }
-
-    impl(const PAK &owner, const std::string &filepath)
-        : owner{owner} {
-        load(filepath);
-    }
-
-    bool
-    load(const std::string &filepath) {
-        entries.clear();
-        input.reset();
-
-        const auto stream = std::make_shared<std::fstream>(filepath, OPEN_MODE);
-
-        if (*stream) {
-            std::vector<RawEntry> raw_entries;
-
-            std::copy(
-                std::istream_iterator<RawEntry>(*stream),
-                std::istream_iterator<RawEntry>(),
-                std::back_inserter(raw_entries)
-            );
-
-            std::transform(
-                std::begin(raw_entries),
-                std::end(raw_entries) - 1,
-                std::begin(raw_entries) + 1,
-                std::back_inserter(entries),
-                [&](const auto &entry1, const auto &entry2) {
-                    return Entry{
-                        .owner = owner,
-                        .name = entry1.second,
-                        .offset = entry1.first,
-                        .size = entry2.first - entry1.first
-                    };
-                }
-            );
-
-            input = stream;
-        }
-
-        return input && !input->bad();
-    }
-};
-
-PAK::PAK()
-    : pimpl_{std::make_unique<impl>(*this)} {
-}
-
-PAK::~PAK() {
-}
-
-bool
+std::optional<PAK>
 PAK::load(const std::string &filepath) {
-    return pimpl_->load(filepath);
+    std::fstream input(filepath, std::fstream::in|std::fstream::binary);
+
+    if (!input) return std::nullopt;
+
+    std::vector<PAKRawEntry> raw_entries;
+    std::copy(
+        std::istream_iterator<PAKRawEntry>(input),
+        std::istream_iterator<PAKRawEntry>(),
+        std::back_inserter(raw_entries)
+    );
+
+    auto pak = std::make_optional<PAK>();
+    std::transform(
+        std::begin(raw_entries),
+        std::end(raw_entries) - 1,
+        std::begin(raw_entries) + 1,
+        std::back_inserter(pak->entries_),
+        [&](const auto &raw_entry1, const auto &raw_entry2) {
+            return Entry{
+                .offset   = raw_entry1.first,
+                .size     = raw_entry2.first - raw_entry1.first,
+                .name     = raw_entry1.second,
+                .filepath = std::make_shared<std::string>(filepath)
+            };
+        }
+    );
+
+    return pak;
 }
 
 PAK::const_iterator
 PAK::begin() const {
-    return pimpl_->entries.begin();
+    return entries_.begin();
 }
 
 PAK::const_iterator
 PAK::end() const {
-    return pimpl_->entries.end();
+    return entries_.end();
 }
 
 PAK::const_iterator
@@ -134,40 +101,29 @@ PAK::cend() const {
 ///////////////////////////////////////////////////////////////////////////////
 // PAK::EntryBuffer
 
-struct PAK::EntryBuffer::impl {
-    std::weak_ptr<std::fstream> input;
-    const PAK::Entry entry;
-    uintmax_t pos;
-    char ch;
-
-    impl(const PAK::Entry &entry)
-        : entry(entry)
-        , pos{0}
-        , ch{0} {
-    }
-};
-
-PAK::EntryBuffer::EntryBuffer(const PAK::Entry &entry)
-    : pimpl_(std::make_unique<impl>(entry)) {
-    pimpl_->input = entry.owner.pimpl_->input;
+PAK::EntryBuffer::EntryBuffer(const Entry &entry)
+    : offset_{entry.offset}
+    , size_{entry.size}
+    , pos_{0}
+    , ch_{0}
+    , input_(*entry.filepath, std::fstream::in|std::fstream::binary) {
 }
 
 std::streambuf::int_type
 PAK::EntryBuffer::underflow() {
     const auto _EOF = std::char_traits<char>::eof();
-    const auto input = pimpl_->input.lock();
-    if (input && pimpl_->pos < pimpl_->entry.size) {
-        input->clear();
-        input->seekg(pimpl_->entry.offset + pimpl_->pos);
-        if (*input) {
-            pimpl_->ch = input->get();
-            pimpl_->pos +=  1;
+    if (input_ && pos_ < size_) {
+        input_.clear();
+        input_.seekg(offset_ + pos_);
+        if (input_) {
+            ch_ = input_.get();
+            pos_ += 1;
         }
     } else {
-        pimpl_->ch = _EOF;
+        ch_ = _EOF;
     }
-    setg(&pimpl_->ch, &pimpl_->ch, &pimpl_->ch + 1);
-    return pimpl_->ch;
+    setg(&ch_, &ch_, &ch_ + 1);
+    return ch_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,7 +131,8 @@ PAK::EntryBuffer::underflow() {
 
 PAK::EntryBuffer
 PAK::Entry::buffer() const {
-    return EntryBuffer(*this);
+    EntryBuffer buf(*this);
+    return buf;
 }
 
 } // namespace nr::dune2
