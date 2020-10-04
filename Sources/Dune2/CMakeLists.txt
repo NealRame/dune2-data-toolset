@@ -5,6 +5,8 @@ add_library(${PROJECT_NAME}
   io.hpp
   pak.cpp
   pak.hpp
+  shp.cpp
+  shp.hpp
 )
 target_compile_features(${PROJECT_NAME}
   PUBLIC
