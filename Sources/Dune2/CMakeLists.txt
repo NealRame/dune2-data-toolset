@@ -5,6 +5,8 @@ add_library(${PROJECT_NAME}
   io.hpp
   pak.cpp
   pak.hpp
+  palette.cpp
+  palette.hpp
   shp.cpp
   shp.hpp
 )
