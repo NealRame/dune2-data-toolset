@@ -3,6 +3,8 @@ project(dune2)
 add_library(${PROJECT_NAME}
   io.cpp
   io.hpp
+  pak.cpp
+  pak.hpp
 )
 target_compile_features(${PROJECT_NAME}
   PUBLIC

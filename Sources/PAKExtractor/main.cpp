@@ -1,6 +1,5 @@
-#include "pak.hpp"
-
-#include "Dune2/io.hpp"
+#include <Dune2/io.hpp>
+#include <Dune2/pak.hpp>
 
 #include <filesystem>
 #include <fstream>

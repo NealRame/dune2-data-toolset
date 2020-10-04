@@ -2,8 +2,6 @@ project(pak-extractor)
 
 add_executable(${PROJECT_NAME}
   main.cpp
-  pak.cpp
-  pak.hpp
 )
 target_compile_features(${PROJECT_NAME}
   PRIVATE cxx_std_17
