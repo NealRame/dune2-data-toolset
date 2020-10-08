@@ -7,7 +7,7 @@
 namespace std {
 
 std::istream &
-operator>>(std::istream &input, nr::dune2::Palette::Color &color) {
+operator>>(std::istream &input, nr::dune2::Color &color) {
     using nr::dune2::io::readInteger;
     if (input) {
         color.red = readInteger<1, uint8_t>(input);
@@ -29,8 +29,8 @@ Palette::load(const std::string &filepath) {
     auto palette = std::make_optional<Palette>();
 
     std::copy(
-        std::istream_iterator<Palette::Color>(input),
-        std::istream_iterator<Palette::Color>(),
+        std::istream_iterator<Color>(input),
+        std::istream_iterator<Color>(),
         std::back_inserter(palette->colors_)
     );
 

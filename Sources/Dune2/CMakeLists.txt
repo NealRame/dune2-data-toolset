@@ -1,6 +1,7 @@
 project(dune2)
 
 add_library(${PROJECT_NAME}
+  color.hpp
   io.cpp
   io.hpp
   pak.cpp
