@@ -16,6 +16,8 @@ public:
     { return colors_.size(); }
 
     const Color &operator[](std::size_t index) const
+    { return colors_[index]; }
+
 private:
     std::vector<Color> colors_;
 };
