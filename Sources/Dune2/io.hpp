@@ -29,6 +29,22 @@ readInteger(std::istream &input) {
     return value;
 }
 
+// writeInteger
+template<int N, typename IntType>
+void
+writeInteger(std::ostream &output, IntType value) {
+    static_assert(std::is_integral<IntType>::value, "Integral type required");
+    static_assert(N <= sizeof(uintmax_t), "N is to big");
+
+    std::conditional_t<
+        std::is_unsigned_v<IntType>,
+        uintmax_t,
+        intmax_t
+    > v = value;
+
+    output.write(reinterpret_cast<char *>(&v), N);
+}
+
 // readData
 // read a given amount of data from the input stream and return it in a vector
 template<typename T = std::uint8_t>
