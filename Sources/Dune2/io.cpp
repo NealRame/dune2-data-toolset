@@ -11,6 +11,15 @@ IPosOffsetGuard::~IPosOffsetGuard() {
     input_.seekg(pos_);
 }
 
+OPosOffsetGuard::OPosOffsetGuard(std::ostream &output)
+    : output_{output}
+    , pos_{output_.tellp()} {
+}
+
+OPosOffsetGuard::~OPosOffsetGuard() {
+    output_.seekp(pos_);
+}
+
 std::string
 readString(std::istream &in) {
     char c;

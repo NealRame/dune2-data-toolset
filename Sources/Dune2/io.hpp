@@ -15,6 +15,15 @@ public:
     ~IPosOffsetGuard();
 };
 
+class OPosOffsetGuard {
+    std::ostream &output_;
+    std::ostream::pos_type pos_;
+
+public:
+    OPosOffsetGuard(std::ostream &);
+    ~OPosOffsetGuard();
+};
+
 /// readInteger
 /// generic function to read an integer on a input stream
 template<int N, typename IntType = uint32_t>
