@@ -1,6 +1,8 @@
 project(dune2)
 
 add_library(${PROJECT_NAME}
+  bmp.cpp
+  bmp.hpp
   color.hpp
   io.cpp
   io.hpp
