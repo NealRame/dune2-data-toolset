@@ -15,3 +15,4 @@ conan_setup(
 
 add_subdirectory(Sources/Dune2)
 add_subdirectory(Sources/PAKExtractor)
+add_subdirectory(Sources/PALToBMP)
