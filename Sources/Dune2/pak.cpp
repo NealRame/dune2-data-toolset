@@ -31,13 +31,6 @@ operator>>(std::istream &in, PAKRawEntry &entry) {
     }
     return in;
 }
-
-std::ostream &
-operator<<(std::ostream &out, const nr::dune2::PAK::Entry &entry) {
-    auto buf = entry.buffer();
-    out << &buf;
-    return out;
-}
 } // namespace std
 
 namespace nr::dune2 {
@@ -98,39 +91,14 @@ PAK::cend() const {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// PAK::EntryBuffer
-
-PAK::EntryBuffer::EntryBuffer(const Entry &entry)
-    : offset_{entry.offset}
-    , size_{entry.size}
-    , pos_{0}
-    , ch_{0}
-    , input_(*entry.filepath, std::fstream::in|std::fstream::binary) {
-}
-
-std::streambuf::int_type
-PAK::EntryBuffer::underflow() {
-    const auto _EOF = std::char_traits<char>::eof();
-    if (input_ && pos_ < size_) {
-        input_.clear();
-        input_.seekg(offset_ + pos_);
-        if (input_) {
-            ch_ = input_.get();
-            pos_ += 1;
-        }
-    } else {
-        ch_ = _EOF;
-    }
-    setg(&ch_, &ch_, &ch_ + 1);
-    return ch_;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // PAK::Entry
 
-PAK::EntryBuffer
-PAK::Entry::buffer() const {
-    EntryBuffer buf(*this);
+std::string
+PAK::Entry::read() const {
+    std::string buf(size, 0);
+    std::ifstream input(*filepath, std::ifstream::in|std::ifstream::binary);
+    input.seekg(offset);
+    input.read(buf.data(), buf.size());
     return buf;
 }
 

@@ -74,7 +74,7 @@ main(int argc, char const *argv[]) {
                 std::cerr << "extracting " << entry.name << " ... " << std::endl;
             }
 
-            out << entry;
+            out.write(entry.read().data(), entry.size);
         }
     };
 
