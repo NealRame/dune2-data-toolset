@@ -88,10 +88,10 @@ BMP::store(const std::string &filepath) const {
 
     // write pixels
     const auto row_size = static_cast<unsigned int>(std::ceilf(3.*width_/4.)*4);
-    for (auto row = 0; row < height_; ++row) {
+    for (auto row = height_; row > 0; --row) {
         // Write row pixels
         std::copy_n(
-            pixels_.begin() + row*width_,
+            pixels_.begin() + (row - 1)*width_,
             width_,
             std::ostream_iterator<Color>(output)
         );
