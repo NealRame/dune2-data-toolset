@@ -120,6 +120,9 @@ shp_read_frame(std::istream &input, std::istream::pos_type pos) {
     input.seekg(pos);
 
     std::bitset<16> frame_flags(io::readInteger<2>(input));
+    static const auto HasRemapTable = 0u;
+    static const auto NoLCW = 1u;
+    static const auto CustomSizeRemap = 2u;
 
     input.ignore(1);
 
@@ -130,8 +133,8 @@ shp_read_frame(std::istream &input, std::istream::pos_type pos) {
     const auto frame_size = io::readInteger<2, std::size_t>(input);
     const auto rle_data_size = io::readInteger<2, std::size_t>(input);
 
-    if (frame_flags[0]) {                      // HasRemapTable is set
-        const auto remap_size = frame_flags[2] // CustomSizeRemap is set
+    if (frame_flags[HasRemapTable]) {                        // HasRemapTable is set
+        const auto remap_size = frame_flags[CustomSizeRemap] // CustomSizeRemap is set
             ? io::readInteger<1, std::size_t>(input)
             : 16;
         
