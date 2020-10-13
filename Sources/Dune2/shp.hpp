@@ -16,7 +16,7 @@ public:
         std::size_t width;
         std::size_t height;
         std::vector<uint8_t> remapTable;
-        std::vector<std::uint8_t> data;
+        std::vector<uint8_t> data;
     };
 
 public:
