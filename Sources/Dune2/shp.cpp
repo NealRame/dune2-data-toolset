@@ -204,4 +204,11 @@ SHP::cend() const {
     return end();
 }
 
+uint8_t
+SHP::Frame::operator[](std::size_t index) const {
+    return remapTable.size() > 0
+        ? remapTable[data[index]]
+        : data[index];
+}
+
 } // namespace nr::dune2

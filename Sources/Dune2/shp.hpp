@@ -17,6 +17,8 @@ public:
         std::size_t height;
         std::vector<uint8_t> remapTable;
         std::vector<uint8_t> data;
+
+        uint8_t operator[](std::size_t index) const;
     };
 
 public:
