@@ -24,8 +24,8 @@ public:
     ~OPosOffsetGuard();
 };
 
-/// readInteger
-/// generic function to read an integer on a input stream
+/// readLEInteger
+/// generic function to read a little endian integer on a input stream
 template<int N, typename IntType = uint32_t>
 IntType
 readLEInteger(std::istream &input) {
