@@ -17,15 +17,6 @@ public:
     ~IPosOffsetGuard();
 };
 
-class OPosOffsetGuard {
-    std::ostream &output_;
-    std::ostream::pos_type pos_;
-
-public:
-    OPosOffsetGuard(std::ostream &);
-    ~OPosOffsetGuard();
-};
-
 /// readLEInteger
 /// generic function to read a little endian integer on a input stream
 template<int N, typename IntType = uint32_t>
@@ -54,22 +45,6 @@ readBEInteger(std::istream &input) {
     return byte_swap<IntType>::swap(value);
 }
 
-// writeInteger
-template<int N, typename IntType>
-void
-writeInteger(std::ostream &output, IntType value) {
-    static_assert(std::is_integral<IntType>::value, "Integral type required");
-    static_assert(N <= sizeof(uintmax_t), "N is to big");
-
-    std::conditional_t<
-        std::is_unsigned_v<IntType>,
-        uintmax_t,
-        intmax_t
-    > v = value;
-
-    output.write(reinterpret_cast<char *>(&v), N);
-}
-
 // readData
 // read a given amount of data from the input stream and return it in a vector
 template<typename T = std::uint8_t>
@@ -86,6 +61,32 @@ readData(std::istream &input, std::size_t count) {
 }
 
 std::string readString(std::istream &);
+
+class OPosOffsetGuard {
+    std::ostream &output_;
+    std::ostream::pos_type pos_;
+
+public:
+    OPosOffsetGuard(std::ostream &);
+    ~OPosOffsetGuard();
+};
+
+// writeInteger
+template<int N, typename IntType>
+void
+writeInteger(std::ostream &output, IntType value) {
+    static_assert(std::is_integral<IntType>::value, "Integral type required");
+    static_assert(N <= sizeof(uintmax_t), "N is to big");
+
+    std::conditional_t<
+        std::is_unsigned_v<IntType>,
+        uintmax_t,
+        intmax_t
+    > v = value;
+
+    output.write(reinterpret_cast<char *>(&v), N);
+}
+
 } // namespace nr::dune2
 
 std::ostream & operator<<(std::ostream &, const std::function<std::ostream &(std::ostream &)> &);
