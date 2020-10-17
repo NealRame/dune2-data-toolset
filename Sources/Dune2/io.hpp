@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Dune2/bswap.hpp>
+
 #include <functional>
 #include <istream>
 #include <optional>
@@ -36,6 +38,20 @@ readLEInteger(std::istream &input) {
     input.read(((char *)&value), N);
 
     return value;
+}
+
+/// readBEInteger
+/// generic function to read a big endian integer on a input stream
+template<int N, typename IntType = uint32_t>
+IntType
+readBEInteger(std::istream &input) {
+    static_assert(std::is_integral<IntType>::value, "Integral type required");
+    static_assert(sizeof(IntType) >= N, "Integral type size too small");
+
+    IntType value = IntType{0};
+    input.read(((char *)&value), N);
+
+    return byte_swap<IntType>::swap(value);
 }
 
 // writeInteger
