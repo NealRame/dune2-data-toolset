@@ -8,11 +8,11 @@ namespace std {
 
 std::istream &
 operator>>(std::istream &input, nr::dune2::Color &color) {
-    using nr::dune2::io::readInteger;
+    using nr::dune2::io::readLEInteger;
     if (input) {
-        color.red = readInteger<1, uint8_t>(input)*4;
-        color.green = readInteger<1, uint8_t>(input)*4;
-        color.blue = readInteger<1, uint8_t>(input)*4;
+        color.red = readLEInteger<1, uint8_t>(input)*4;
+        color.green = readLEInteger<1, uint8_t>(input)*4;
+        color.blue = readLEInteger<1, uint8_t>(input)*4;
     }
     return input;
 }

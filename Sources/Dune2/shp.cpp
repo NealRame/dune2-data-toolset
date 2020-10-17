@@ -12,7 +12,7 @@ SHP::Version
 shp_read_version(std::fstream &input) {
     io::IPosOffsetGuard _(input);
     input.seekg(4);
-    return nr::dune2::io::readInteger<2>(input) != 0
+    return nr::dune2::io::readLEInteger<2>(input) != 0
         ? SHP::v100
         : SHP::v107;
 }
@@ -21,16 +21,16 @@ template<SHP::Version V>
 std::istream::pos_type
 shp_read_frame_offset(std::istream &input) {
     if constexpr(V == SHP::v100) {
-        return io::readInteger<2, std::uint16_t>(input);
+        return io::readLEInteger<2, std::uint16_t>(input);
     } else {
-        return io::readInteger<4, std::uint32_t>(input) + 2;
+        return io::readLEInteger<4, std::uint32_t>(input) + 2;
     }
 }
 
 std::vector<std::istream::pos_type>
 shp_read_frame_offsets(std::istream &input, SHP::Version version) {
     std::vector<std::istream::pos_type> offsets;
-    const auto frame_count = io::readInteger<2, unsigned int>(input);
+    const auto frame_count = io::readLEInteger<2, unsigned int>(input);
     std::generate_n(
         std::back_inserter(offsets),
         frame_count,
@@ -52,8 +52,8 @@ shp_read_data(std::istream &input, std::size_t count, std::vector<uint8_t> &dst)
 
 void
 shp_lcw_deflate(std::istream &input, std::size_t size, std::vector<uint8_t> &dst) {
-    const auto read_byte = [&]() { return io::readInteger<1, uint8_t>(input); };
-    const auto read_word = [&]() { return io::readInteger<2, uint16_t>(input); };
+    const auto read_byte = [&]() { return io::readLEInteger<1, uint8_t>(input); };
+    const auto read_word = [&]() { return io::readLEInteger<2, uint16_t>(input); };
     const auto copy_block = [&](auto count, auto pos, bool relative) {
         std::copy_n(
             relative
@@ -119,27 +119,27 @@ shp_read_frame(std::istream &input, std::istream::pos_type pos) {
 
     input.seekg(pos);
 
-    std::bitset<16> frame_flags(io::readInteger<2>(input));
+    std::bitset<16> frame_flags(io::readLEInteger<2>(input));
     static const auto HasRemapTable = 0u;
     static const auto NoLCW = 1u;
     static const auto CustomSizeRemap = 2u;
 
     input.ignore(1);
 
-    frame.width = io::readInteger<2, std::size_t>(input);
-    frame.height = io::readInteger<1, std::size_t>(input);
+    frame.width = io::readLEInteger<2, std::size_t>(input);
+    frame.height = io::readLEInteger<1, std::size_t>(input);
     frame.data.reserve(frame.width*frame.height);
 
-    const auto frame_size = io::readInteger<2, std::size_t>(input);
-    const auto rle_data_size = io::readInteger<2, std::size_t>(input);
+    const auto frame_size = io::readLEInteger<2, std::size_t>(input);
+    const auto rle_data_size = io::readLEInteger<2, std::size_t>(input);
 
     if (frame_flags[HasRemapTable]) {                        // HasRemapTable is set
         const auto remap_size = frame_flags[CustomSizeRemap] // CustomSizeRemap is set
-            ? io::readInteger<1, std::size_t>(input)
+            ? io::readLEInteger<1, std::size_t>(input)
             : 16;
         
         for (auto i = 0; i < remap_size; ++i) {
-            frame.remapTable.push_back(io::readInteger<1, std::uint8_t>(input));
+            frame.remapTable.push_back(io::readLEInteger<1, std::uint8_t>(input));
         }
     }
 

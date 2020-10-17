@@ -28,7 +28,7 @@ public:
 /// generic function to read an integer on a input stream
 template<int N, typename IntType = uint32_t>
 IntType
-readInteger(std::istream &input) {
+readLEInteger(std::istream &input) {
     static_assert(std::is_integral<IntType>::value, "Integral type required");
     static_assert(sizeof(IntType) >= N, "Integral type size too small");
 

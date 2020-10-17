@@ -16,10 +16,10 @@ namespace std {
 
 std::istream &
 operator>>(std::istream &in, PAKRawEntry &entry) {
-    using nr::dune2::io::readInteger;
+    using nr::dune2::io::readLEInteger;
     using nr::dune2::io::readString;
     if (in) {
-        const auto offset = readInteger<4, PAKRawEntry::first_type>(in);
+        const auto offset = readLEInteger<4, PAKRawEntry::first_type>(in);
         if (offset > 0) {
             entry = std::make_pair(offset, readString(in));
         } else {
