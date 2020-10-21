@@ -103,7 +103,7 @@ main(int argc, char **argv) {
         nr::dune2::BMP bmp(frame.width, frame.height);
         for (auto i = 0; i < frame.data.size(); ++i) {
             const auto row = i/frame.width;
-            const auto col = i%frame.height;
+            const auto col = i%frame.width;
             const auto color_index = frame[i];
             if (color_index > 0) {
                 bmp.putPixel(col, row, (*palette)[color_index]);
