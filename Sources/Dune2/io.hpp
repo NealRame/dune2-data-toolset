@@ -2,9 +2,11 @@
 
 #include <Dune2/bswap.hpp>
 
+#include <array>
 #include <functional>
 #include <istream>
 #include <optional>
+#include <string_view>
 
 namespace nr::dune2::io {
 
@@ -43,6 +45,25 @@ readBEInteger(std::istream &input) {
     input.read(((char *)&value), N);
 
     return byte_swap<IntType>::swap(value);
+}
+
+struct InputCheckFailedError : public std::exception {
+};
+
+template<typename ValueType>
+void
+check(std::istream &input, ValueType v) {
+    constexpr auto value = v();
+    constexpr auto N = value.size();
+    std::array<char, N> buf;
+    try {
+        input.read(buf.data(), N);
+    } catch (...) {
+        throw InputCheckFailedError();
+    }
+    if (input.gcount() != N || std::string_view(buf.data(), N) != value) {
+        throw InputCheckFailedError();
+    }
 }
 
 // readData
