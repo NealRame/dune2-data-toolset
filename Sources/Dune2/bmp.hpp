@@ -16,8 +16,7 @@ public:
     unsigned int height() const { return height_; }
 
 public:
-    void putPixel(unsigned int x, unsigned y, const Color &);
-    void fillRect(unsigned int x, unsigned y, unsigned int w, unsigned int h, const Color &);
+    void putPixel(unsigned int x, unsigned int y, const Color &);
 
 public:
     void store(const std::string &filepath) const;
