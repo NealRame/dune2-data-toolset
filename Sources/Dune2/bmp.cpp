@@ -7,7 +7,7 @@
 namespace std {
 std::ostream &
 operator<<(std::ostream &output, const nr::dune2::Color &c) {
-    return output.put(c.red).put(c.green).put(c.blue);
+    return output.put(c.blue).put(c.green).put(c.red);
 }
 } // namespace std
 
@@ -33,13 +33,14 @@ BMP::BMP(unsigned int width, unsigned int height)
 }
 
 void
-BMP::putPixel(unsigned int x, unsigned y, const Color &c) {
+BMP::putPixel(unsigned int x, unsigned int y, const Color &c) {
+    assert(x < width_ && y < height_);
     pixels_[y*width_ + x] = c;
 }
 
 void
 BMP::fillRect(
-    unsigned int x, unsigned y,
+    unsigned int x, unsigned int y,
     unsigned int w, unsigned int h,
     const Color &c) {
     const auto x_max = std::min(x + w, width_), x_min = x;
