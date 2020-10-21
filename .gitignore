@@ -1,6 +1,6 @@
 .DS_Store
 .conan*
-.vscode/launch.json
+.vscode
 
 /[Bb]uild
 /Data
