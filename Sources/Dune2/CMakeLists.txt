@@ -21,3 +21,13 @@ target_include_directories(${PROJECT_NAME}
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
+if(ADDRESS_SANITIZER)
+  target_compile_options(${PROJECT_NAME}
+    PUBLIC
+      -O0 -fno-omit-frame-pointer -fsanitize=address
+  )
+  target_link_options(${PROJECT_NAME}
+    PUBLIC
+      -fno-omit-frame-pointer -fsanitize=address
+  )
+endif()
