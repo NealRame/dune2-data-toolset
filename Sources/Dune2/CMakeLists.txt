@@ -5,6 +5,8 @@ add_library(${PROJECT_NAME}
   bmp.hpp
   bswap.hpp
   color.hpp
+  icn.hpp
+  icn.cpp
   io.cpp
   io.hpp
   pak.cpp
