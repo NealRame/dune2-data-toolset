@@ -1,5 +1,6 @@
 #include <Dune2/bmp.hpp>
 #include <Dune2/icn.hpp>
+
 #include <Dune2/io.hpp>
 #include <Dune2/palette.hpp>
 
@@ -27,11 +28,13 @@ main(int argc, char **argv) {
     po::options_description hidden;
     hidden.add_options()
         ("input-pal-file", po::value<fs::path>(), "PAL file path.")
+        ("input-map-file", po::value<fs::path>(), "MAP file path.")
         ("input-icn-file", po::value<fs::path>(), "ICN file path.");
 
     po::positional_options_description args;
     args
         .add("input-pal-file", 1)
+        .add("input-map-file", 1)
         .add("input-icn-file", 1);
 
     po::options_description cli;
@@ -74,6 +77,13 @@ main(int argc, char **argv) {
         return 0;
     }
 
+    if (vm.count("input-map-file") == 0) {
+        std::cerr << "MAP file path is missing!" << std::endl
+            << usage
+            << std::endl;
+        return 1;
+    }
+
     if (vm.count("input-icn-file") == 0) {
         std::cerr << "ICN file path is missing!" << std::endl
             << usage
@@ -88,35 +98,25 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    const auto icn = nr::dune2::ICN::load(vm["input-icn-file"].as<fs::path>());
+    const auto pal = nr::dune2::Palette::load(vm["input-pal-file"].as<fs::path>());
+    if (!pal) {
+        std::cerr << "Cannot load PAL file!" << std::endl;
+        return 1;
+    }
+
+    const auto icn = nr::dune2::ICN::load(
+        vm["input-map-file"].as<fs::path>(),
+        vm["input-icn-file"].as<fs::path>(),
+        *pal
+    );
     if (!icn) {
         std::cerr << "Cannot load ICN file!" << std::endl;
         return 1;
     }
 
-    const auto palette = nr::dune2::Palette::load(vm["input-pal-file"].as<fs::path>());
-    if (!palette) {
-        std::cerr << "Cannot load PAL file!" << std::endl;
-        return 1;
-    }
-
-    for (auto &&tile: *icn) {
-        nr::dune2::BMP bmp(tile.info.width, tile.info.height);
-        const auto tile_size = tile.info.width*tile.info.height;
-        for (auto i = 0; i < tile_size; ++i) {
-            const auto row = i/tile.info.width;
-            const auto col = i%tile.info.height;
-            const auto color_index = tile[i];
-            if (color_index > 0) {
-                bmp.putPixel(col, row, (*palette)[color_index]);
-            } else {
-                bmp.putPixel(col, row, nr::dune2::Color{
-                    0x0,
-                    0xff,
-                    0x0,
-                });
-            }
-        }
+    for (auto &&icon: *icn) {
+        nr::dune2::BMP bmp(icon.getWidth(), icon.getHeight());
+        bmp.drawSurface(0, 0, icon);
         bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
     }
 

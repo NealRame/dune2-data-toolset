@@ -87,34 +87,21 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    const auto shp = nr::dune2::SHP::load(vm["input-shp-file"].as<fs::path>());
+    const auto pal = nr::dune2::Palette::load(vm["input-pal-file"].as<fs::path>());
+    if (!pal) {
+        std::cerr << "Cannot load PAL file!" << std::endl;
+        return 1;
+    }
+
+    const auto shp = nr::dune2::SHP::load(vm["input-shp-file"].as<fs::path>(), *pal);
     if (!shp) {
         std::cerr << "Cannot load SHP file!" << std::endl;
         return 1;
     }
 
-    const auto palette = nr::dune2::Palette::load(vm["input-pal-file"].as<fs::path>());
-    if (!palette) {
-        std::cerr << "Cannot load PAL file!" << std::endl;
-        return 1;
-    }
-
     for (auto &&frame: *shp) {
-        nr::dune2::BMP bmp(frame.width, frame.height);
-        for (auto i = 0; i < frame.data.size(); ++i) {
-            const auto row = i/frame.width;
-            const auto col = i%frame.width;
-            const auto color_index = frame[i];
-            if (color_index > 0) {
-                bmp.putPixel(col, row, (*palette)[color_index]);
-            } else {
-                bmp.putPixel(col, row, nr::dune2::Color{
-                    0x0,
-                    0xff,
-                    0x0,
-                });
-            }
-        }
+        nr::dune2::BMP bmp(frame.getWidth(), frame.getHeight());
+        bmp.drawSurface(0, 0, frame);
         bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
     }
 

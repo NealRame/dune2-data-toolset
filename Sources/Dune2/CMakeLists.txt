@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME}
   palette.hpp
   shp.cpp
   shp.hpp
+  surface.hpp
 )
 target_compile_features(${PROJECT_NAME}
   PUBLIC

@@ -1,8 +1,12 @@
 #pragma once
 
+#include <Dune2/palette.hpp>
+#include <Dune2/surface.hpp>
+
 #include <filesystem>
 #include <optional>
 #include <vector>
+#include <memory>
 
 namespace nr::dune2 {
 class SHP {
@@ -12,17 +16,26 @@ public:
         v107 = 107,
     };
 
-    struct Frame {
-        std::size_t width;
-        std::size_t height;
-        std::vector<uint8_t> remapTable;
-        std::vector<uint8_t> data;
+    class Frame : public Surface {
+    public:
+        Frame(std::istream &, std::istream::pos_type, const Palette &);
+        Frame(Frame &&);
+        Frame &operator=(Frame &&);
 
-        uint8_t operator[](std::size_t index) const;
+        virtual ~Frame();
+
+    public:
+        virtual std::size_t getWidth() const override;
+        virtual std::size_t getHeight() const override;
+        virtual Color getPixel(std::size_t x, std::size_t y) const override;
+    
+    private:
+        struct impl;
+        std::unique_ptr<impl> d;
     };
 
 public:
-    static std::optional<SHP> load(const std::string &filepath);
+    static std::optional<SHP> load(const std::string &filepath, const Palette &);
 
 public:
     using const_iterator = std::vector<Frame>::const_iterator;

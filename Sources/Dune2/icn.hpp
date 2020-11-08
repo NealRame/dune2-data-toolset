@@ -1,5 +1,10 @@
 #pragma once
 
+#include <Dune2/palette.hpp>
+#include <Dune2/surface.hpp>
+
+#include <iterator>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -19,19 +24,36 @@ public:
         { return 1<<bitPerPixels; }
     };
 
-    struct Tile {
-        Info info;
-        std::vector<uint8_t> paletteOffsets;
-        std::vector<uint8_t> data;
+    class Icon: public Surface {
+        friend class ICN;
 
-        uint8_t operator[](std::size_t index) const;
+    public:
+        Icon(Icon &&);
+        Icon &operator=(Icon &&);
+        virtual ~Icon();
+
+    public:
+        virtual std::size_t getWidth() const override;
+        virtual std::size_t getHeight() const override;
+        virtual Color getPixel(std::size_t x, std::size_t y) const override;
+
+    private:
+        Icon(const Palette &, size_t, size_t, const Info &);
+
+    private:
+        struct impl;
+        std::unique_ptr<impl> d;
     };
 
 public:
-    static std::optional<ICN> load(const std::string &filepath);
+    static std::optional<ICN> load(
+        const std::string &map_filepath,
+        const std::string &icn_filepath,
+        const Palette &
+    );
 
 public:
-    using const_iterator = std::vector<Tile>::const_iterator;
+    using const_iterator = std::vector<Icon>::const_iterator;
 
     const_iterator begin() const;
     const_iterator end() const;
@@ -40,7 +62,6 @@ public:
     const_iterator cend() const;
 
 private:
-    Info info_;
-    std::vector<Tile> tiles_;
+    std::vector<Icon> icons_;
 };
 } // namespace nr::dune2

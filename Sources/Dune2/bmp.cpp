@@ -26,28 +26,39 @@ operator"" _ppm(long long unsigned res) {
 }
 } // namespace
 
-BMP::BMP(unsigned int width, unsigned int height)
+BMP::BMP(std::size_t width, std::size_t height)
     : width_{width}
     , height_{height}
     , pixels_(width_*height_, Color{0, 0, 0}) {
 }
 
 void
-BMP::putPixel(unsigned int x, unsigned int y, const Color &c) {
+BMP::putPixel(std::size_t x, std::size_t y, const Color &c) {
     assert(x < width_ && y < height_);
     pixels_[y*width_ + x] = c;
 }
 
 void
 BMP::fillRect(
-    unsigned int x, unsigned int y,
-    unsigned int w, unsigned int h,
+    std::size_t x, std::size_t y,
+    std::size_t w, std::size_t h,
     const Color &c) {
     const auto x_max = std::min(x + w, width_), x_min = x;
     const auto y_max = std::min(y + h, height_);
     for (; y < y_max; ++y) {
         for (x = x_min; x < x_max; ++x) {
             putPixel(x, y, c);
+        }
+    }
+}
+
+void
+BMP::drawSurface(std::size_t x, std::size_t y, const Surface &surface) {
+    const auto w = std::min(surface.getWidth(), width_ - x);
+    const auto h = std::min(surface.getHeight(), height_ - y);
+    for (auto sx = 0; sx < w; ++sx) {
+        for (auto sy = 0; sy < h; ++sy) {
+            putPixel(x + sx, y + sy, surface.getPixel(sx, sy));
         }
     }
 }

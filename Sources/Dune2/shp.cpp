@@ -113,61 +113,10 @@ shp_lcw_deflate(std::istream &input, std::size_t size, std::vector<uint8_t> &dst
     }
 }
 
-SHP::Frame
-shp_read_frame(std::istream &input, std::istream::pos_type pos) {
-    SHP::Frame frame;
-
-    input.seekg(pos);
-
-    std::bitset<16> frame_flags(io::readLEInteger<2>(input));
-    static const auto HasRemapTable = 0u;
-    static const auto NoLCW = 1u;
-    static const auto CustomSizeRemap = 2u;
-
-    input.ignore(1);
-
-    frame.width = io::readLEInteger<2, std::size_t>(input);
-    frame.height = io::readLEInteger<1, std::size_t>(input);
-    frame.data.reserve(frame.width*frame.height);
-
-    const auto frame_size = io::readLEInteger<2, std::size_t>(input);
-    const auto rle_data_size = io::readLEInteger<2, std::size_t>(input);
-
-    if (frame_flags[HasRemapTable]) {                        // HasRemapTable is set
-        const auto remap_size = frame_flags[CustomSizeRemap] // CustomSizeRemap is set
-            ? io::readLEInteger<1, std::size_t>(input)
-            : 16;
-        
-        for (auto i = 0; i < remap_size; ++i) {
-            frame.remapTable.push_back(io::readLEInteger<1, std::uint8_t>(input));
-        }
-    }
-
-    const auto frame_data_size = frame_size - (input.tellg() - pos);
-
-    std::vector<uint8_t> rle_data;
-    rle_data.reserve(rle_data_size);
-    if (frame_flags[1]) {
-        shp_read_data(input, frame_data_size, rle_data);
-    } else {
-        shp_lcw_deflate(input, frame_data_size, rle_data);
-    }
-
-    auto it = rle_data.begin();
-    while (it != rle_data.end()) {
-        const auto n = it - rle_data.begin();
-        const auto value = *it++;
-        const auto count = (value == 0 ? *it++ : 1);
-        frame.data.insert(frame.data.end(), count, value);
-    }
-
-    return frame;
-}
-
 } // namespace
 
 std::optional<SHP>
-SHP::load(const std::string &filepath) {
+SHP::load(const std::string &filepath, const Palette &palette) {
     std::fstream input(filepath, std::ios::binary|std::ios::in);
 
     auto shp = std::make_optional<SHP>();
@@ -180,7 +129,7 @@ SHP::load(const std::string &filepath) {
         offsets.end(),
         std::back_inserter(shp->frames_),
         [&](const auto pos) {
-            return shp_read_frame(input, pos);
+            return std::move(Frame(input, pos, palette));
         }
     );
 
@@ -207,11 +156,98 @@ SHP::cend() const {
     return end();
 }
 
-uint8_t
-SHP::Frame::operator[](std::size_t index) const {
-    return remapTable.size() > 0
-        ? remapTable[data[index]]
-        : data[index];
+struct SHP::Frame::impl {
+    const Palette &palette;
+    std::size_t width;
+    std::size_t height;
+    std::vector<uint8_t> remapTable;
+    std::vector<uint8_t> data;
+    impl(const Palette &palette) : palette{palette} { }
+};
+
+SHP::Frame::Frame(
+    std::istream &input,
+    std::istream::pos_type pos,
+    const Palette &palette)
+    : d{std::make_unique<Frame::impl>(palette)} {
+    input.seekg(pos);
+
+    std::bitset<16> frame_flags(io::readLEInteger<2>(input));
+
+    static const auto HasRemapTable = 0u;
+    static const auto NoLCW = 1u;
+    static const auto CustomSizeRemap = 2u;
+
+    input.ignore(1);
+
+    d->width = io::readLEInteger<2, std::size_t>(input);
+    d->height = io::readLEInteger<1, std::size_t>(input);
+    d->data.reserve(d->width*d->height);
+
+    const auto frame_size = io::readLEInteger<2, std::size_t>(input);
+    const auto rle_data_size = io::readLEInteger<2, std::size_t>(input);
+
+    if (frame_flags[HasRemapTable]) {                        // HasRemapTable is set
+        const auto remap_size = frame_flags[CustomSizeRemap] // CustomSizeRemap is set
+            ? io::readLEInteger<1, std::size_t>(input)
+            : 16;
+        
+        for (auto i = 0; i < remap_size; ++i) {
+            d->remapTable.push_back(io::readLEInteger<1, std::uint8_t>(input));
+        }
+    }
+
+    const auto frame_data_size = frame_size - (input.tellg() - pos);
+
+    std::vector<uint8_t> rle_data;
+    rle_data.reserve(rle_data_size);
+    if (frame_flags[1]) {
+        shp_read_data(input, frame_data_size, rle_data);
+    } else {
+        shp_lcw_deflate(input, frame_data_size, rle_data);
+    }
+
+    auto it = rle_data.begin();
+    while (it != rle_data.end()) {
+        const auto n = it - rle_data.begin();
+        const auto value = *it++;
+        const auto count = (value == 0 ? *it++ : 1);
+        d->data.insert(d->data.end(), count, value);
+    }
+}
+
+SHP::Frame::Frame(Frame &&rhs) {
+    *this = std::move(rhs);
+}
+
+SHP::Frame &
+SHP::Frame::operator=(Frame &&rhs) {
+    d = std::move(rhs.d);
+    return *this;
+}
+
+SHP::Frame::~Frame() {
+}
+
+std::size_t
+SHP::Frame::getWidth() const {
+    return d->width;
+}
+
+std::size_t
+SHP::Frame::getHeight() const {
+    return d->height;
+}
+
+Color
+SHP::Frame::getPixel(std::size_t x, std::size_t y) const {
+    assert(x < getWidth());
+    assert(y < getHeight());
+    const auto index = d->data[y*getWidth() + x];
+    return d->palette[d->remapTable.size() > 0
+        ? d->remapTable[index]
+        : index
+    ];
 }
 
 } // namespace nr::dune2

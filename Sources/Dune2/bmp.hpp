@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Dune2/color.hpp>
+#include <Dune2/surface.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -9,22 +10,23 @@ namespace nr::dune2 {
 
 class BMP {
 public:
-    BMP(unsigned int width, unsigned int height);
+    BMP(std::size_t width, std::size_t height);
 
 public:
-    unsigned int width() const  { return width_; }
-    unsigned int height() const { return height_; }
+    std::size_t width() const  { return width_; }
+    std::size_t height() const { return height_; }
 
 public:
-    void putPixel(unsigned int x, unsigned int y, const Color &);
-    void fillRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, const Color &);
+    void putPixel(std::size_t x, std::size_t y, const Color &);
+    void fillRect(std::size_t x, std::size_t y, std::size_t w, std::size_t h, const Color &);
+    void drawSurface(std::size_t x, std::size_t y, const Surface &);
 
 public:
     void store(const std::string &filepath) const;
 
 private:
-    unsigned int width_;
-    unsigned int height_;
+    std::size_t width_;
+    std::size_t height_;
     std::vector<Color> pixels_;
 };
 
