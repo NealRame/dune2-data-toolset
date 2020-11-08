@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Scripts/CMake")
 
 include(Conan)
 
-conan_env(VERSION 1.29.2)
+conan_env(VERSION 1.30.2)
 conan_setup(
   CONANFILE ${CMAKE_SOURCE_DIR}/conanfile.txt
   CMAKE_TARGETS
