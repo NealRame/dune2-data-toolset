@@ -18,14 +18,14 @@ public:
 
     public:
         struct Info {
-            unsigned int width;
-            unsigned int height;
-            unsigned int bitPerPixels;
+            std::size_t width;
+            std::size_t height;
+            std::size_t bitPerPixels;
 
-            std::size_t tileSize() const
+            std::size_t getTileSize() const
             { return (width*height*bitPerPixels)/8; }
 
-            std::size_t paletteSize() const
+            std::size_t getPaletteSize() const
             { return 1<<bitPerPixels; }
         };
 
@@ -129,24 +129,24 @@ public:
     );
 
 public:
-    std::size_t tileCount() const;
+    std::size_t getTileCount() const;
     Tile getTile(std::size_t tile_index) const;
 
-    TileIterator tiles_begin() const;
-    TileIterator tiles_end() const;
+    TileIterator tilesBegin() const;
+    TileIterator tilesEnd() const;
 
     TileRange tiles() const
-    { return TileRange{tiles_begin(), tiles_end()}; }
+    { return TileRange{tilesBegin(), tilesEnd()}; }
 
 public:
-    std::size_t iconCount() const;
+    std::size_t getIconCount() const;
     Icon getIcon(std::size_t icon_index) const;
 
-    IconIterator icons_begin() const;
-    IconIterator icons_end() const;
+    IconIterator iconsBegin() const;
+    IconIterator iconsEnd() const;
 
     IconRange icons() const
-    { return IconRange{icons_begin(), icons_end()}; }
+    { return IconRange{iconsBegin(), iconsEnd()}; }
 
 private:
     const Palette &palette_;

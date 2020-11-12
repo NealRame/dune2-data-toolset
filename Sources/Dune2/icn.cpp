@@ -69,7 +69,7 @@ read_sset_chunk(std::fstream &input, const ICN::Tile::Info &info) {
     io::check(input, []{ return "SSET"sv; });
 
     const auto sset_chunk_size = io::readBEInteger<4>(input);
-    const auto tile_size = info.tileSize();
+    const auto tile_size = info.getTileSize();
     const auto tile_count = (sset_chunk_size - 4)/tile_size;
 
     // We ignore the four next bytes.
@@ -93,7 +93,7 @@ read_rpal_chunk(std::fstream &input, const ICN::Tile::Info &info) {
     io::check(input, []{ return "RPAL"sv; });
 
     const auto rpal_chunk_size = io::readBEInteger<4>(input);
-    const auto pal_size = info.paletteSize();
+    const auto pal_size = info.getPaletteSize();
     const auto pal_count = rpal_chunk_size/pal_size;
 
     RPal rpal;
@@ -298,13 +298,13 @@ ICN::load(
 }
 
 std::size_t
-ICN::tileCount() const {
+ICN::getTileCount() const {
     return tilesDataTable_.size();
 }
 
 ICN::Tile
 ICN::getTile(std::size_t tile_index) const {
-    assert(tilesPaletteIndexesTable_.size() == tileCount());
+    assert(tilesPaletteIndexesTable_.size() == getTileCount());
     return Tile(
         palette_,
         tileInfo_,
@@ -314,7 +314,7 @@ ICN::getTile(std::size_t tile_index) const {
 }
 
 std::size_t
-ICN::iconCount() const {
+ICN::getIconCount() const {
     return iconsTilesMapping_.size();
 }
 
@@ -337,29 +337,29 @@ ICN::getIcon(std::size_t icon_index) const {
 }
 
 ICN::TileIterator
-ICN::tiles_begin() const {
+ICN::tilesBegin() const {
     using namespace std::placeholders;
     return TileIterator(std::bind(&ICN::getTile, this, _1), 0);
 }
 
 ICN::TileIterator 
-ICN::tiles_end() const {
+ICN::tilesEnd() const {
     return TileIterator([](auto tile_index) -> Tile {
         throw std::out_of_range("tile index out of range");
-    }, tileCount());
+    }, getTileCount());
 }
 
 ICN::IconIterator
-ICN::icons_begin() const {
+ICN::iconsBegin() const {
     using namespace std::placeholders;
     return IconIterator(std::bind(&ICN::getIcon, this, _1), 0);
 }
 
 ICN::IconIterator
-ICN::icons_end() const {
+ICN::iconsEnd() const {
     return IconIterator([](auto icon_index) -> Icon {
         throw std::out_of_range("icon index out of range");
-    }, iconCount());
+    }, getIconCount());
 }
 
 } // namespace nr::dune2
