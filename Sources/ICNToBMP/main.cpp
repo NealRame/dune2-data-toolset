@@ -114,9 +114,9 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    for (auto &&icon: *icn) {
-        nr::dune2::BMP bmp(icon.getWidth(), icon.getHeight());
-        bmp.drawSurface(0, 0, icon);
+    for (auto &&surface: icn->icons()) {
+        nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
+        bmp.drawSurface(0, 0, surface);
         bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
     }
 

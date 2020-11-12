@@ -41,7 +41,7 @@ using SSet = std::vector<std::vector<uint8_t>>;
 using RPal = std::vector<std::vector<uint8_t>>;
 using RTbl = std::vector<uint8_t>;
 
-ICN::Info
+ICN::Tile::Info
 read_sinf_chunk(std::fstream &input) {
     using namespace std::literals;
 
@@ -55,7 +55,7 @@ read_sinf_chunk(std::fstream &input) {
 
     const auto bit_per_pixel = io::readLEInteger<1>(input);
 
-    return ICN::Info{
+    return ICN::Tile::Info{
         width  << shift,
         height << shift,
         bit_per_pixel
@@ -63,7 +63,7 @@ read_sinf_chunk(std::fstream &input) {
 }
 
 SSet
-read_sset_chunk(std::fstream &input, const ICN::Info &info) {
+read_sset_chunk(std::fstream &input, const ICN::Tile::Info &info) {
     using namespace std::literals;
 
     io::check(input, []{ return "SSET"sv; });
@@ -87,7 +87,7 @@ read_sset_chunk(std::fstream &input, const ICN::Info &info) {
 }
 
 RPal
-read_rpal_chunk(std::fstream &input, const ICN::Info &info) {
+read_rpal_chunk(std::fstream &input, const ICN::Tile::Info &info) {
     using namespace std::literals;
 
     io::check(input, []{ return "RPAL"sv; });
@@ -106,7 +106,7 @@ read_rpal_chunk(std::fstream &input, const ICN::Info &info) {
 }
 
 RTbl
-read_rtbl_chunk(std::fstream &input, const ICN::Info &info) {
+read_rtbl_chunk(std::fstream &input, const ICN::Tile::Info &info) {
     using namespace std::literals;
 
     io::check(input, []{ return "RTBL"sv; });
@@ -117,176 +117,144 @@ read_rtbl_chunk(std::fstream &input, const ICN::Info &info) {
     return rtbl;
 }
 
-struct Tile: public Surface {
-    virtual std::size_t getWidth() const override {
-        return info.width;
+std::tuple<size_t, size_t>
+icon_shape_from_index(unsigned int index, size_t size) {
+    std::tuple<size_t, size_t> wh;
+    switch (index) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        wh = std::make_tuple(3, 2);
+        break;
+    case 4:
+        wh = std::make_tuple(4, 2);
+        break;
+    case 5:
+        wh = std::make_tuple(15, 5);
+        break;
+    case 6:
+        wh = std::make_tuple(4, 4);
+        break;
+    case 8:
+        wh = std::make_tuple(27, 3);
+        break;
+    case 10:
+        wh = std::make_tuple(3, 12);
+        break;
+    case 11:
+        wh = std::make_tuple(2, 12);
+        break;
+    case 12:
+    case 13:
+        wh = std::make_tuple(3, 16);
+        break;
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+        wh = std::make_tuple(2, 8);
+        break;
+    case 19:
+        wh = std::make_tuple(3, 30);
+        break;
+    case 20:
+    case 21:
+        wh = std::make_tuple(3, 20);
+        break;
+    case 22:
+    case 23:
+        wh = std::make_tuple(1, 10);
+        break;
+    case 24:
+        wh = std::make_tuple(2, 8);
+        break;
+    case 25:
+        wh = std::make_tuple(2, 12);
+        break;
+    default:
+        wh = std::make_tuple(size, 1);
+        break;
     }
 
-    virtual std::size_t getHeight() const override {
-        return info.width;
-    }
+    std::cout
+        << "ICON#" << index
+        << " size=" << size
+        << " w=" << std::get<0>(wh)
+        << " h=" << std::get<1>(wh)
+    << std::endl;
 
-    virtual Color getPixel(std::size_t x, std::size_t y) const override {
-        const auto index = y*getWidth() + x;
+    assert(std::get<0>(wh)*std::get<1>(wh) <= size);
 
-        const auto k = (index*info.bitPerPixels)/8;
-        const auto s = info.bitPerPixels - (index*info.bitPerPixels)%8;
-        const auto p = (data[k] >> s) & ((1 << info.bitPerPixels) - 1);
-
-        return palette[paletteOffsets[p]];
-    }
-
-    Tile(
-        const ICN::Info &info,
-        const std::vector<uint8_t> &data,
-        const std::vector<uint8_t> &paletteOffsets,
-        const Palette &palette)
-        : info{info}
-        , data{data}
-        , paletteOffsets{paletteOffsets}
-        , palette{palette} {
-    }
-
-    const ICN::Info &info;
-    const std::vector<uint8_t> &data;
-    const std::vector<uint8_t> &paletteOffsets;
-    const Palette &palette;
-};
-
+    return wh;
+}
 } // namespace
 
-struct ICN::Icon::impl {
-    const Palette &palette;
-    const std::size_t width{1};
-    const std::size_t height{1};
-    const ICN::Info tileInfo;
-    std::vector<std::vector<uint8_t>> tiles;
-    std::vector<std::vector<uint8_t>> paletteOffsets;
-
-    static std::tuple<size_t, size_t> shape(unsigned int index, size_t size) {
-        std::tuple<size_t, size_t> wh;
-        switch (index) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            wh = std::make_tuple(3, 2);
-            break;
-        case 4:
-            wh = std::make_tuple(4, 2);
-            break;
-        case 5:
-            wh = std::make_tuple(15, 5);
-            break;
-        case 6:
-            wh = std::make_tuple(4, 4);
-            break;
-        case 8:
-            wh = std::make_tuple(27, 3);
-            break;
-        case 10:
-            wh = std::make_tuple(3, 12);
-            break;
-        case 11:
-            wh = std::make_tuple(2, 12);
-            break;
-        case 12:
-        case 13:
-            wh = std::make_tuple(3, 16);
-            break;
-        case 14:
-        case 15:
-        case 16:
-        case 17:
-        case 18:
-            wh = std::make_tuple(2, 8);
-            break;
-        case 19:
-            wh = std::make_tuple(3, 30);
-            break;
-        case 20:
-        case 21:
-            wh = std::make_tuple(3, 20);
-            break;
-        case 22:
-        case 23:
-            wh = std::make_tuple(1, 10);
-            break;
-        case 24:
-            wh = std::make_tuple(2, 8);
-            break;
-        case 25:
-            wh = std::make_tuple(2, 12);
-            break;
-        default:
-            wh = std::make_tuple(size, 1);
-            break;
-        }
-
-        std::cout
-            << "ICON#" << index
-            << " size=" << size
-            << " w=" << std::get<0>(wh)
-            << " h=" << std::get<1>(wh)
-        << std::endl;
-
-        assert(std::get<0>(wh)*std::get<1>(wh) <= size);
-
-        return wh;
-    }
-
-    impl(const Palette &palette, std::size_t width, std::size_t height, const ICN::Info &tileInfo)
-        : palette{palette}
-        , width{width}
-        , height{height}
-        , tileInfo{tileInfo} {
-    }
-};
-
-ICN::Icon::Icon(const Palette &palette, size_t width, size_t height, const ICN::Info &info)
-    : d{std::make_unique<impl>(palette, width, height, info)} {
+ICN::Tile::Tile(
+    const Palette &palette,
+    const Info &info,
+    const std::vector<uint8_t> &data,
+    const std::vector<uint8_t> &paletteIndexes)
+    : palette_{palette}
+    , info_{info}
+    , data_{data}
+    , paletteIndexes_{paletteIndexes} {
 }
 
-ICN::Icon::Icon(Icon &&rhs) {
-    *this = std::move(rhs);
+std::size_t
+ICN::Tile::getWidth() const {
+    return info_.width;
 }
 
-ICN::Icon &
-ICN::Icon::operator=(Icon &&rhs) {
-    d = std::move(rhs.d);
-    return *this;
+std::size_t
+ICN::Tile::getHeight() const {
+    return info_.width;
 }
 
-ICN::Icon::~Icon() {
+Color
+ICN::Tile::getPixel(std::size_t x, std::size_t y) const {
+    const auto index = y*getWidth() + x;
+
+    const auto k = (index*info_.bitPerPixels)/8;
+    const auto s = info_.bitPerPixels - (index*info_.bitPerPixels)%8;
+    const auto p = (data_[k] >> s) & ((1 << info_.bitPerPixels) - 1);
+
+    return palette_[paletteIndexes_[p]];
+}
+
+ICN::Icon::Icon(std::size_t width, std::size_t height, const Tile::Info &tile_info)
+    : width_{width}
+    , height_{height}
+    , tileInfo_{tile_info} {
 }
 
 std::size_t
 ICN::Icon::getWidth() const {
-    return d->tileInfo.width*d->width;
+    return width_*tileInfo_.width;
 }
 
 std::size_t
 ICN::Icon::getHeight() const {
-    return d->tileInfo.height*d->height;
+    return height_*tileInfo_.height;
 }
 
-Color
+Color 
 ICN::Icon::getPixel(std::size_t x, std::size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());
 
-    const auto tile_index = x/d->tileInfo.width + y/d->tileInfo.height*d->width;
-    const auto tile = Tile(
-        d->tileInfo,
-        d->tiles[tile_index],
-        d->paletteOffsets[tile_index],
-        d->palette
-    );
+    const auto tile_index = x/tileInfo_.width + y/tileInfo_.height*width_;
+    const auto &tile = tiles_[tile_index];
 
-    x = x%d->tileInfo.width;
-    y = y%d->tileInfo.height;
+    x = x%tileInfo_.width;
+    y = y%tileInfo_.height;
 
     return tile.getPixel(x, y);
+}
+
+ICN::ICN(const Palette &palette)
+    : palette_{palette} {
 }
 
 std::optional<ICN>
@@ -298,11 +266,9 @@ ICN::load(
     std::fstream map_input(map_filepath, std::ios::binary|std::ios::in);
     std::fstream icn_input(icn_filepath, std::ios::binary|std::ios::in);
 
-    auto icn = std::make_optional<ICN>();
+    auto icn = std::make_optional<ICN>(palette);
 
     try {
-        const auto imap = read_icons_map(map_input);
-
         // First read IFF chunk group ID (wich must be FORM)
         io::check(icn_input, []{ return "FORM"sv;});
 
@@ -311,31 +277,19 @@ ICN::load(
         // Check group type is ICON
         io::check(icn_input, []{ return "ICON"sv;});
 
+
         auto info = read_sinf_chunk(icn_input);
-        auto sset = read_sset_chunk(icn_input, info);
-        auto rpal = read_rpal_chunk(icn_input, info);
-        auto rtbl = read_rtbl_chunk(icn_input, info);
 
-        assert(sset.size() == rtbl.size());
+        icn->tileInfo_ = info;
+        
+        // Keep read order below
+        icn->tilesDataTable_ = read_sset_chunk(icn_input, info);
+        icn->tilesPaletteIndexes_ = read_rpal_chunk(icn_input, info);
+        icn->tilesPaletteIndexesTable_ = read_rtbl_chunk(icn_input, info);
 
-        std::transform(
-            imap.begin(), imap.end(),
-            std::back_inserter(icn->icons_),
-            [&, i = 0](const auto &tile_indexes) mutable {
-                const auto [icon_width, icon_height] = Icon::impl::shape(i++, tile_indexes.size());
+        assert(icn->tilesDataTable_.size() == icn->tilesPaletteIndexesTable_.size());
 
-                Icon icon(palette, icon_width, icon_height, info);
-
-                for (const auto tile_index: tile_indexes) {
-                    assert(tile_index < sset.size());
-                    assert(tile_index < rtbl.size());
-                    icon.d->tiles.push_back(sset[tile_index]);
-                    icon.d->paletteOffsets.push_back(rpal[rtbl[tile_index]]);
-                }
-
-                return std::move(icon);
-            }
-        );
+        icn->iconsTilesMapping_ = read_icons_map(map_input);
     } catch (...) {
         return std::nullopt;
     }
@@ -343,23 +297,69 @@ ICN::load(
     return icn;
 }
 
-ICN::const_iterator
-ICN::begin() const {
-    return icons_.begin();
+std::size_t
+ICN::tileCount() const {
+    return tilesDataTable_.size();
 }
 
-ICN::const_iterator
-ICN::end() const {
-    return icons_.end();
+ICN::Tile
+ICN::getTile(std::size_t tile_index) const {
+    assert(tilesPaletteIndexesTable_.size() == tileCount());
+    return Tile(
+        palette_,
+        tileInfo_,
+        tilesDataTable_[tile_index],
+        tilesPaletteIndexes_[tilesPaletteIndexesTable_[tile_index]]
+    );
 }
 
-ICN::const_iterator
-ICN::cbegin() const {
-    return begin();
+std::size_t
+ICN::iconCount() const {
+    return iconsTilesMapping_.size();
 }
 
-ICN::const_iterator
-ICN::cend() const {
-    return end();
+ICN::Icon
+ICN::getIcon(std::size_t icon_index) const {
+    const auto icon_mapping = iconsTilesMapping_[icon_index];
+    const auto [icon_width, icon_height] = icon_shape_from_index(icon_index, icon_mapping.size());
+    Icon icon(icon_width, icon_height, tileInfo_);
+
+    std::transform(
+        icon_mapping.begin(),
+        icon_mapping.end(),
+        std::back_inserter(icon.tiles_),
+        [&] (auto tile_index) {
+            return getTile(tile_index);
+        }
+    );
+
+    return icon;
 }
+
+ICN::TileIterator
+ICN::tiles_begin() const {
+    using namespace std::placeholders;
+    return TileIterator(std::bind(&ICN::getTile, this, _1), 0);
+}
+
+ICN::TileIterator 
+ICN::tiles_end() const {
+    return TileIterator([](auto tile_index) -> Tile {
+        throw std::out_of_range("tile index out of range");
+    }, tileCount());
+}
+
+ICN::IconIterator
+ICN::icons_begin() const {
+    using namespace std::placeholders;
+    return IconIterator(std::bind(&ICN::getIcon, this, _1), 0);
+}
+
+ICN::IconIterator
+ICN::icons_end() const {
+    return IconIterator([](auto icon_index) -> Icon {
+        throw std::out_of_range("icon index out of range");
+    }, iconCount());
+}
+
 } // namespace nr::dune2
