@@ -1,6 +1,7 @@
 #include "icn.hpp"
 #include "io.hpp"
 
+#include <stdexcept>
 #include <fstream>
 #include <iostream>
 
@@ -277,7 +278,6 @@ ICN::load(
         // Check group type is ICON
         io::check(icn_input, []{ return "ICON"sv;});
 
-
         auto info = read_sinf_chunk(icn_input);
 
         icn->tileInfo_ = info;
@@ -287,7 +287,9 @@ ICN::load(
         icn->tilesPaletteIndexes_ = read_rpal_chunk(icn_input, info);
         icn->tilesPaletteIndexesTable_ = read_rtbl_chunk(icn_input, info);
 
-        assert(icn->tilesDataTable_.size() == icn->tilesPaletteIndexesTable_.size());
+        if (icn->tilesDataTable_.size() != icn->tilesPaletteIndexesTable_.size()) {
+            throw std::invalid_argument("corrupted file");
+        }
 
         icn->iconsTilesMapping_ = read_icons_map(map_input);
     } catch (...) {
