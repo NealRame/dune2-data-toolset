@@ -1,4 +1,4 @@
-project(paltobmp)
+project(PALToBMP)
 
 add_executable(${PROJECT_NAME}
   main.cpp

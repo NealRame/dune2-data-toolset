@@ -1,0 +1,48 @@
+set(NR_OUTPUT_NAME_PREFIX "" CACHE STRING "Global output name prefix")
+
+function(nr_get_all_targets out_var)
+  set(targets)
+  macro(nr_get_all_targets_recursive targets dir)
+    get_property(subdirectories DIRECTORY ${dir} PROPERTY SUBDIRECTORIES)
+    foreach(subdir ${subdirectories})
+      nr_get_all_targets_recursive(${targets} ${subdir})
+    endforeach()
+    get_property(current_targets DIRECTORY ${dir} PROPERTY BUILDSYSTEM_TARGETS)
+    list(APPEND ${targets} ${current_targets})
+  endmacro()
+
+  nr_get_all_targets_recursive(targets ${CMAKE_CURRENT_SOURCE_DIR})
+  set(${out_var} ${targets} PARENT_SCOPE)
+endfunction()
+
+function(nr_string cmd str out_var)
+  string(TOUPPER "${cmd}" cmd)
+  if(cmd STREQUAL "TO_SNAKE_CASE")
+    string(REGEX REPLACE "(.)([A-Z][a-z]+)" "\\1-\\2" ${out_var} "${str}")
+    string(REGEX REPLACE "([a-z0-9])([A-Z])" "\\1-\\2" ${out_var} "${${out_var}}")
+    string(TOLOWER "${${out_var}}" ${out_var})
+    set(${out_var} "${${out_var}}" PARENT_SCOPE)
+  endif()
+endfunction(nr_string)
+
+function(nr_set_target_output_name)
+  cmake_parse_arguments("" "" "PREFIX" "TARGETS" ${ARGN})
+
+  foreach(target ${_TARGETS})
+    get_property(target_type TARGET "${target}" PROPERTY TYPE)
+
+    message(DEBUG "target ${target} type is ${target_type}")
+
+    if("${target_type}" STREQUAL "EXECUTABLE")
+      nr_string(TO_SNAKE_CASE "${target}" output_name)
+      if(_PREFIX)
+        set(output_name "${_PREFIX}-${output_name}")
+      elseif(NR_OUTPUT_NAME_PREFIX)
+        set(output_name "${NR_OUTPUT_NAME_PREFIX}-${output_name}")
+      endif()
+      message(STATUS "Target '${target}' output name is '${output_name}'")
+      set_target_properties(${target} PROPERTIES OUTPUT_NAME "${output_name}")
+    endif()
+  endforeach()
+endfunction(nr_set_target_output_name)
+

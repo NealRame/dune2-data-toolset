@@ -1,4 +1,4 @@
-project(pakextract)
+project(PAKExtract)
 
 add_executable(${PROJECT_NAME}
   main.cpp

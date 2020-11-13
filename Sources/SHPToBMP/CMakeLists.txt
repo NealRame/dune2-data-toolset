@@ -1,4 +1,4 @@
-project(shptobmp)
+project(SHPToBMP)
 
 add_executable(${PROJECT_NAME}
   main.cpp

@@ -1,4 +1,4 @@
-project(icntobmp)
+project(ICNToBMP)
 
 add_executable(${PROJECT_NAME}
   main.cpp
