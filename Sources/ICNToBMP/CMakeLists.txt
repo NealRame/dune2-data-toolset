@@ -12,7 +12,8 @@ target_link_libraries(${PROJECT_NAME}
     CONAN_PKG::boost
 )
 set_target_properties(${PROJECT_NAME}
-  PROPERTIES CXX_VISIBILITY_PRESET hidden
+  PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
 )
 if(ADDRESS_SANITIZER)
   target_compile_options(${PROJECT_NAME}
