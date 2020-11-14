@@ -1,5 +1,7 @@
 set(NR_OUTPUT_NAME_PREFIX "" CACHE STRING "Global output name prefix")
 
+# Return the list of all targets added from the current directory.
+# Code stolen from: https://stackoverflow.com/a/62311397/2537295
 function(nr_get_all_targets out_var)
   set(targets)
   macro(nr_get_all_targets_recursive targets dir)
@@ -15,34 +17,16 @@ function(nr_get_all_targets out_var)
   set(${out_var} ${targets} PARENT_SCOPE)
 endfunction()
 
-function(nr_string cmd str out_var)
-  string(TOUPPER "${cmd}" cmd)
-  if(cmd STREQUAL "TO_SNAKE_CASE")
-    string(REGEX REPLACE "(.)([A-Z][a-z]+)" "\\1-\\2" ${out_var} "${str}")
-    string(REGEX REPLACE "([a-z0-9])([A-Z])" "\\1-\\2" ${out_var} "${${out_var}}")
-    string(TOLOWER "${${out_var}}" ${out_var})
-    set(${out_var} "${${out_var}}" PARENT_SCOPE)
+# Force the OUTPUT_NAME property to follow some conventions.
+function(nr_set_target_output_name target)
+  cmake_parse_arguments("" "" "PREFIX" "" ${ARGN})
+  string(TOLOWER "${target}" output_name)
+  if(_PREFIX)
+    set(output_name "${_PREFIX}-${output_name}")
+  elseif(NR_OUTPUT_NAME_PREFIX)
+    set(output_name "${NR_OUTPUT_NAME_PREFIX}-${output_name}")
   endif()
-endfunction(nr_string)
-
-function(nr_set_target_output_name)
-  cmake_parse_arguments("" "" "PREFIX" "TARGETS" ${ARGN})
-
-  foreach(target ${_TARGETS})
-    get_property(target_type TARGET "${target}" PROPERTY TYPE)
-
-    message(DEBUG "target ${target} type is ${target_type}")
-
-    if("${target_type}" STREQUAL "EXECUTABLE")
-      nr_string(TO_SNAKE_CASE "${target}" output_name)
-      if(_PREFIX)
-        set(output_name "${_PREFIX}-${output_name}")
-      elseif(NR_OUTPUT_NAME_PREFIX)
-        set(output_name "${NR_OUTPUT_NAME_PREFIX}-${output_name}")
-      endif()
-      message(STATUS "Target '${target}' output name is '${output_name}'")
-      set_target_properties(${target} PROPERTIES OUTPUT_NAME "${output_name}")
-    endif()
-  endforeach()
+  message(STATUS "Target '${target}' output name is '${output_name}'")
+  set_target_properties(${target} PROPERTIES OUTPUT_NAME "${output_name}")
 endfunction(nr_set_target_output_name)
 

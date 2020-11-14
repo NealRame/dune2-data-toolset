@@ -22,7 +22,13 @@ add_subdirectory(Sources/ICNToBMP)
 add_subdirectory(Sources/PALToBMP)
 add_subdirectory(Sources/SHPToBMP)
 nr_get_all_targets(TARGETS)
-nr_set_target_output_name(
-  TARGETS ${TARGETS}
-  PREFIX dune2
-)
+foreach(target ${TARGETS})
+  get_property(target_type TARGET "${target}" PROPERTY TYPE)
+
+  message(DEBUG "target ${target} type is ${target_type}")
+
+  if("${target_type}" STREQUAL "EXECUTABLE")
+    nr_set_target_output_name(${target} PREFIX dune2)
+  endif()
+endforeach()
+
