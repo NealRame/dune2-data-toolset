@@ -116,7 +116,7 @@ shp_lcw_deflate(std::istream &input, std::size_t size, std::vector<uint8_t> &dst
 } // namespace
 
 std::optional<SHP>
-SHP::load(const std::string &filepath, const Palette &palette) {
+SHP::load(const std::string &filepath) {
     std::fstream input(filepath, std::ios::binary|std::ios::in);
 
     auto shp = std::make_optional<SHP>();
@@ -129,7 +129,7 @@ SHP::load(const std::string &filepath, const Palette &palette) {
         offsets.end(),
         std::back_inserter(shp->frames_),
         [&](const auto pos) {
-            return std::move(Frame(input, pos, palette));
+            return std::move(Frame(input, pos));
         }
     );
 
@@ -157,19 +157,14 @@ SHP::cend() const {
 }
 
 struct SHP::Frame::impl {
-    const Palette &palette;
     std::size_t width;
     std::size_t height;
     std::vector<uint8_t> remapTable;
     std::vector<uint8_t> data;
-    impl(const Palette &palette) : palette{palette} { }
 };
 
-SHP::Frame::Frame(
-    std::istream &input,
-    std::istream::pos_type pos,
-    const Palette &palette)
-    : d{std::make_unique<Frame::impl>(palette)} {
+SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
+    : d{std::make_unique<Frame::impl>()} {
     input.seekg(pos);
 
     std::bitset<16> frame_flags(io::readLEInteger<2>(input));
@@ -239,15 +234,14 @@ SHP::Frame::getHeight() const {
     return d->height;
 }
 
-Color
+std::size_t
 SHP::Frame::getPixel(std::size_t x, std::size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());
     const auto index = d->data[y*getWidth() + x];
-    return d->palette[d->remapTable.size() > 0
+    return d->remapTable.size() > 0
         ? d->remapTable[index]
-        : index
-    ];
+        : index;
 }
 
 } // namespace nr::dune2

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Dune2/iterators.hpp>
-#include <Dune2/palette.hpp>
 #include <Dune2/surface.hpp>
 
 #include <optional>
@@ -59,13 +58,12 @@ public:
         /// #### method `nr::dune2::Tileset::Tile.getPixel`
         /// See [`nr::dune2::Surface.getPixel`](/docs/nr/dune2/surface#getPixel)
         /// for more details.
-        virtual Color getPixel(std::size_t x, std::size_t y) const override;
+        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
 
     private:
-        Tile(const Palette &, const Info &, const std::vector<uint8_t> &, const std::vector<uint8_t> &);
+        Tile(const Info &, const std::vector<uint8_t> &, const std::vector<uint8_t> &);
 
     private:
-        const Palette &palette_;
         const Info &info_;
         const std::vector<uint8_t> &data_;
         const std::vector<uint8_t> &paletteIndexes_;
@@ -74,9 +72,6 @@ public:
     /// ### class `nr::dune2::Tileset::TileIterator`
     /// An input iterator to iterate throught tiles.
     using TileIterator = Iterator<Tile>;
-
-public:
-    Tileset(const Palette &);
 
 public:
     /// ### static method `nr::dune2::Tileset::load`
@@ -88,10 +83,7 @@ public:
     /// `std::optional<Tileset>`
     /// * an initialized optional<Tileset> if load succeed
     /// * `std::nullopt` otherwise
-    static std::optional<Tileset> load(
-        const std::string &icn_path,
-        const Palette &
-    );
+    static std::optional<Tileset> load(const std::string &icn_path);
 
 public:
     /// ### method `nr::dune2::Tileset.getTileInfo`
@@ -123,7 +115,6 @@ public:
     TileIterator end() const;
 
 private:
-    const Palette &palette_;
     Tile::Info tileInfo_;
     std::vector<std::vector<uint8_t>> tilesDataTable_;
     std::vector<uint8_t> tilesPaletteIndexesTable_;

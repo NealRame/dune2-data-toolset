@@ -93,15 +93,15 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    const auto shp = nr::dune2::SHP::load(vm["input-shp-file"].as<fs::path>(), *pal);
+    const auto shp = nr::dune2::SHP::load(vm["input-shp-file"].as<fs::path>());
     if (!shp) {
         std::cerr << "Cannot load SHP file!" << std::endl;
         return 1;
     }
 
-    for (auto &&frame: *shp) {
-        nr::dune2::BMP bmp(frame.getWidth(), frame.getHeight());
-        bmp.drawSurface(0, 0, frame);
+    for (auto &&surface: *shp) {
+        nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
+        bmp.drawSurface(0, 0, surface, *pal);
         bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
     }
 

@@ -34,7 +34,7 @@ public:
         /// #### method `nr::dune2::Iconset::Icon::getPixel`
         /// See [`nr::dune2::Surface.getPixel`](/docs/nr/dune2/surface#getPixel)
         /// for more details.
-        virtual Color getPixel(std::size_t x, std::size_t y) const override;
+        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
 
     private:
         Icon(std::size_t, std::size_t, const Tileset::Tile::Info &);

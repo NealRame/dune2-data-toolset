@@ -100,7 +100,7 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    const auto tileset = nr::dune2::Tileset::load(vm["input-icn-file"].as<fs::path>(), *pal);
+    const auto tileset = nr::dune2::Tileset::load(vm["input-icn-file"].as<fs::path>());
     if (!tileset) {
         std::cerr << "Cannot load ICN file!" << std::endl;
         return 1;
@@ -109,7 +109,7 @@ main(int argc, char **argv) {
     if (vm.count("icons-tiles-map") == 0) {
         for (auto &&surface: *tileset) {
             nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
-            bmp.drawSurface(0, 0, surface);
+            bmp.drawSurface(0, 0, surface, *pal);
             bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
         }
         return 0;
@@ -122,7 +122,7 @@ main(int argc, char **argv) {
     } else {
         for (auto &&surface: *iconset) {
             nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
-            bmp.drawSurface(0, 0, surface);
+            bmp.drawSurface(0, 0, surface, *pal);
             bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
         }
     }

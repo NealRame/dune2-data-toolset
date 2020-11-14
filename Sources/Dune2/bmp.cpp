@@ -6,7 +6,7 @@
 
 namespace std {
 std::ostream &
-operator<<(std::ostream &output, const nr::dune2::Color &c) {
+operator<<(std::ostream &output, const nr::dune2::Palette::Color &c) {
     return output.put(c.blue).put(c.green).put(c.red);
 }
 } // namespace std
@@ -29,11 +29,11 @@ operator"" _ppm(long long unsigned res) {
 BMP::BMP(std::size_t width, std::size_t height)
     : width_{width}
     , height_{height}
-    , pixels_(width_*height_, Color{0, 0, 0}) {
+    , pixels_(width_*height_, Palette::Color{0, 0, 0}) {
 }
 
 void
-BMP::putPixel(std::size_t x, std::size_t y, const Color &c) {
+BMP::putPixel(std::size_t x, std::size_t y, const Palette::Color &c) {
     assert(x < width_ && y < height_);
     pixels_[y*width_ + x] = c;
 }
@@ -42,7 +42,7 @@ void
 BMP::fillRect(
     std::size_t x, std::size_t y,
     std::size_t w, std::size_t h,
-    const Color &c) {
+    const Palette::Color &c) {
     const auto x_max = std::min(x + w, width_), x_min = x;
     const auto y_max = std::min(y + h, height_);
     for (; y < y_max; ++y) {
@@ -53,12 +53,15 @@ BMP::fillRect(
 }
 
 void
-BMP::drawSurface(std::size_t x, std::size_t y, const Surface &surface) {
+BMP::drawSurface(
+    std::size_t x, std::size_t y,
+    const Surface &surface,
+    const Palette & palette) {
     const auto w = std::min(surface.getWidth(), width_ - x);
     const auto h = std::min(surface.getHeight(), height_ - y);
     for (auto sx = 0; sx < w; ++sx) {
         for (auto sy = 0; sy < h; ++sy) {
-            putPixel(x + sx, y + sy, surface.getPixel(sx, sy));
+            putPixel(x + sx, y + sy, palette[surface.getPixel(sx, sy)]);
         }
     }
 }
@@ -105,7 +108,7 @@ BMP::store(const std::string &filepath) const {
         std::copy_n(
             pixels_.begin() + (row - 1)*width_,
             width_,
-            std::ostream_iterator<Color>(output)
+            std::ostream_iterator<Palette::Color>(output)
         );
         // Write row padding
         std::fill_n(

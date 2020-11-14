@@ -91,12 +91,10 @@ read_rtbl_chunk(std::fstream &input, const Tileset::Tile::Info &info) {
 } // namespace
 
 Tileset::Tile::Tile(
-    const Palette &palette,
     const Info &info,
     const std::vector<uint8_t> &data,
     const std::vector<uint8_t> &paletteIndexes)
-    : palette_{palette}
-    , info_{info}
+    : info_{info}
     , data_{data}
     , paletteIndexes_{paletteIndexes} {
 }
@@ -111,7 +109,7 @@ Tileset::Tile::getHeight() const {
     return info_.width;
 }
 
-Color
+std::size_t
 Tileset::Tile::getPixel(std::size_t x, std::size_t y) const {
     const auto index = y*getWidth() + x;
 
@@ -119,21 +117,16 @@ Tileset::Tile::getPixel(std::size_t x, std::size_t y) const {
     const auto s = info_.bitPerPixels - (index*info_.bitPerPixels)%8;
     const auto p = (data_[k] >> s) & ((1 << info_.bitPerPixels) - 1);
 
-    return palette_[paletteIndexes_[p]];
-}
-
-Tileset::Tileset(const Palette &palette)
-    : palette_{palette} {
+    // return palette_[paletteIndexes_[p]];
+    return paletteIndexes_[p];
 }
 
 std::optional<Tileset>
-Tileset::load(
-    const std::string &icn_path,
-    const Palette &palette) {
+Tileset::load(const std::string &icn_path) {
     using namespace std::literals;
     std::fstream icn_input(icn_path, std::ios::binary|std::ios::in);
 
-    auto icn = std::make_optional<Tileset>(palette);
+    auto icn = std::make_optional<Tileset>();
 
     try {
         // First read IFF chunk group ID (wich must be FORM)
@@ -172,7 +165,6 @@ Tileset::Tile
 Tileset::getTile(std::size_t tile_index) const {
     assert(tilesPaletteIndexesTable_.size() == getTileCount());
     return Tile(
-        palette_,
         tileInfo_,
         tilesDataTable_[tile_index],
         tilesPaletteIndexes_[tilesPaletteIndexesTable_[tile_index]]

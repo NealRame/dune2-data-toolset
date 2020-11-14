@@ -18,7 +18,7 @@ public:
 
     class Frame : public Surface {
     public:
-        Frame(std::istream &, std::istream::pos_type, const Palette &);
+        Frame(std::istream &, std::istream::pos_type);
         Frame(Frame &&);
         Frame &operator=(Frame &&);
 
@@ -27,7 +27,7 @@ public:
     public:
         virtual std::size_t getWidth() const override;
         virtual std::size_t getHeight() const override;
-        virtual Color getPixel(std::size_t x, std::size_t y) const override;
+        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
     
     private:
         struct impl;
@@ -35,7 +35,7 @@ public:
     };
 
 public:
-    static std::optional<SHP> load(const std::string &filepath, const Palette &);
+    static std::optional<SHP> load(const std::string &filepath);
 
 public:
     using const_iterator = std::vector<Frame>::const_iterator;

@@ -128,7 +128,7 @@ Iconset::Icon::getHeight() const {
     return height_*tileInfo_.height;
 }
 
-Color 
+std::size_t
 Iconset::Icon::getPixel(std::size_t x, std::size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());

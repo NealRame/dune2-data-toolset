@@ -4,7 +4,7 @@ add_library(${PROJECT_NAME}
   bmp.cpp
   bmp.hpp
   bswap.hpp
-  color.hpp
+  # color.hpp
   iconset.hpp
   iconset.cpp
   io.cpp
