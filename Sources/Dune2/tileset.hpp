@@ -94,6 +94,12 @@ public:
     );
 
 public:
+    /// ### method `nr::dune2::Tileset.getTileInfo`
+    /// #### Return
+    /// `nr::dune2::Tilset::Tile::Info` - tiles info
+    const Tile::Info &getTileInfo() const
+    { return tileInfo_; }
+    
     /// ### method `nr::dune2::Tileset.getTileCount`
     /// #### Return
     /// `std::size_t` - the number of tiles.
@@ -115,12 +121,6 @@ public:
     /// #### Return
     /// `Tileset::TileIterator` - an iterator on the last tile.
     TileIterator end() const;
-
-    /// ### method `nr::dune2::Tileset.getTileInfo`
-    /// #### Return
-    /// `nr::dune2::Tilset::Tile::Info` - tiles info
-    const Tile::Info &getTileInfo() const
-    { return tileInfo_; }
 
 private:
     const Palette &palette_;
