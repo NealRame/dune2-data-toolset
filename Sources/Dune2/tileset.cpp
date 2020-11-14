@@ -99,18 +99,18 @@ Tileset::Tile::Tile(
     , paletteIndexes_{paletteIndexes} {
 }
 
-std::size_t
+size_t
 Tileset::Tile::getWidth() const {
     return info_.width;
 }
 
-std::size_t
+size_t
 Tileset::Tile::getHeight() const {
     return info_.width;
 }
 
-std::size_t
-Tileset::Tile::getPixel(std::size_t x, std::size_t y) const {
+size_t
+Tileset::Tile::getPixel(size_t x, size_t y) const {
     const auto index = y*getWidth() + x;
 
     const auto k = (index*info_.bitPerPixels)/8;
@@ -156,13 +156,13 @@ Tileset::load(const std::string &icn_path) {
     return icn;
 }
 
-std::size_t
+size_t
 Tileset::getTileCount() const {
     return tilesDataTable_.size();
 }
 
 Tileset::Tile
-Tileset::getTile(std::size_t tile_index) const {
+Tileset::getTile(size_t tile_index) const {
     assert(tilesPaletteIndexesTable_.size() == getTileCount());
     return Tile(
         tileInfo_,

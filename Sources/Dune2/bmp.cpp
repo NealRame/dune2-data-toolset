@@ -26,22 +26,22 @@ operator"" _ppm(long long unsigned res) {
 }
 } // namespace
 
-BMP::BMP(std::size_t width, std::size_t height)
+BMP::BMP(size_t width, size_t height)
     : width_{width}
     , height_{height}
     , pixels_(width_*height_, Palette::Color{0, 0, 0}) {
 }
 
 void
-BMP::putPixel(std::size_t x, std::size_t y, const Palette::Color &c) {
+BMP::putPixel(size_t x, size_t y, const Palette::Color &c) {
     assert(x < width_ && y < height_);
     pixels_[y*width_ + x] = c;
 }
 
 void
 BMP::fillRect(
-    std::size_t x, std::size_t y,
-    std::size_t w, std::size_t h,
+    size_t x, size_t y,
+    size_t w, size_t h,
     const Palette::Color &c) {
     const auto x_max = std::min(x + w, width_), x_min = x;
     const auto y_max = std::min(y + h, height_);
@@ -54,7 +54,7 @@ BMP::fillRect(
 
 void
 BMP::drawSurface(
-    std::size_t x, std::size_t y,
+    size_t x, size_t y,
     const Surface &surface,
     const Palette & palette) {
     const auto w = std::min(surface.getWidth(), width_ - x);

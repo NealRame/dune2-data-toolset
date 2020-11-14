@@ -8,7 +8,7 @@
 
 namespace {
 
-using PAKRawEntry = std::pair<std::size_t, std::string>;
+using PAKRawEntry = std::pair<size_t, std::string>;
 
 } // namespace
 
@@ -24,7 +24,7 @@ operator>>(std::istream &in, PAKRawEntry &entry) {
             entry = std::make_pair(offset, readString(in));
         } else {
             entry = std::make_pair(
-                static_cast<std::size_t>(in.seekg(0, std::ios::end).tellg()),
+                static_cast<size_t>(in.seekg(0, std::ios::end).tellg()),
                 ""
             );
         }

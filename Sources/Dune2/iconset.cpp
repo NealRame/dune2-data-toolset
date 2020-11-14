@@ -112,24 +112,24 @@ icon_shape_from_index(unsigned int index, size_t size) {
 }
 } // namespace
 
-Iconset::Icon::Icon(std::size_t width, std::size_t height, const Tileset::Tile::Info &tile_info)
+Iconset::Icon::Icon(size_t width, size_t height, const Tileset::Tile::Info &tile_info)
     : width_{width}
     , height_{height}
     , tileInfo_{tile_info} {
 }
 
-std::size_t
+size_t
 Iconset::Icon::getWidth() const {
     return width_*tileInfo_.width;
 }
 
-std::size_t
+size_t
 Iconset::Icon::getHeight() const {
     return height_*tileInfo_.height;
 }
 
-std::size_t
-Iconset::Icon::getPixel(std::size_t x, std::size_t y) const {
+size_t
+Iconset::Icon::getPixel(size_t x, size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());
 
@@ -164,13 +164,13 @@ Iconset::load(
     return iconset;
 }
 
-std::size_t
+size_t
 Iconset::getIconCount() const {
     return iconsTilesMapping_.size();
 }
 
 Iconset::Icon
-Iconset::getIcon(std::size_t icon_index) const {
+Iconset::getIcon(size_t icon_index) const {
     using namespace std::placeholders;
 
     const auto icon_mapping = iconsTilesMapping_[icon_index];

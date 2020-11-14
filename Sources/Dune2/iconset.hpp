@@ -24,24 +24,24 @@ public:
         /// #### method `nr::dune2::Iconset::Icon.getWidth`
         /// See [`nr::dune2::Surface.getWidth`](/docs/nr/dune2/surface#getWidth)
         /// for more details.
-        virtual std::size_t getWidth() const override;
+        virtual size_t getWidth() const override;
 
         /// #### method `nr::dune2::Iconset::Icon.getHeight`
         /// See [`nr::dune2::Surface.getHeight`](/docs/nr/dune2/surface#getHeight)
         /// for more details.
-        virtual std::size_t getHeight() const override;
+        virtual size_t getHeight() const override;
 
         /// #### method `nr::dune2::Iconset::Icon::getPixel`
         /// See [`nr::dune2::Surface.getPixel`](/docs/nr/dune2/surface#getPixel)
         /// for more details.
-        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
+        virtual size_t getPixel(size_t, size_t) const override;
 
     private:
-        Icon(std::size_t, std::size_t, const Tileset::Tile::Info &);
+        Icon(size_t, size_t, const Tileset::Tile::Info &);
 
     private:
-        std::size_t width_;
-        std::size_t height_;
+        size_t width_;
+        size_t height_;
         const Tileset::Tile::Info &tileInfo_;
         std::vector<Tileset::Tile> tiles_;
     };
@@ -71,15 +71,15 @@ public:
 public:
     /// ### method `nr::dune2::Iconset.getIconCount`
     /// #### Return
-    /// `std::size_t` - the number of icons.
-    std::size_t getIconCount() const;
+    /// `size_t` - the number of icons.
+    size_t getIconCount() const;
 
     /// ### method `nr::dune2::Iconset.getTile`
     /// #### Parameters
     /// * `icon_index` - the icon index.
     /// #### Return
     /// `Iconset::Tile` - a tile _tiles[tile_index]_.
-    Icon getIcon(std::size_t icon_index) const;
+    Icon getIcon(size_t icon_index) const;
 
     /// ### method `nr::dune2::Iconset.iconsBegin`
     /// #### Return

@@ -44,14 +44,14 @@ shp_read_frame_offsets(std::istream &input, SHP::Version version) {
 }
 
 void
-shp_read_data(std::istream &input, std::size_t count, std::vector<uint8_t> &dst) {
+shp_read_data(std::istream &input, size_t count, std::vector<uint8_t> &dst) {
     const auto pos = dst.size();
     dst.resize(dst.size() + count);
     input.read(reinterpret_cast<char *>(dst.data()) + pos, count);
 }
 
 void
-shp_lcw_deflate(std::istream &input, std::size_t size, std::vector<uint8_t> &dst) {
+shp_lcw_deflate(std::istream &input, size_t size, std::vector<uint8_t> &dst) {
     const auto read_byte = [&]() { return io::readLEInteger<1, uint8_t>(input); };
     const auto read_word = [&]() { return io::readLEInteger<2, uint16_t>(input); };
     const auto copy_block = [&](auto count, auto pos, bool relative) {
@@ -73,7 +73,7 @@ shp_lcw_deflate(std::istream &input, std::size_t size, std::vector<uint8_t> &dst
     // deflate process.
     // Well-formed LCW data should match flag 0x80 with the maximum number of
     // bytes of data to read reached.
-    const auto end_pos = std::size_t(input.tellg()) + size;
+    const auto end_pos = size_t(input.tellg()) + size;
 
     for (uint8_t cmd; (cmd = read_byte()) != 0x80 && input.tellg() < end_pos;) {
         if ((cmd & 0xc0) == 0x80) {
@@ -157,8 +157,8 @@ SHP::cend() const {
 }
 
 struct SHP::Frame::impl {
-    std::size_t width;
-    std::size_t height;
+    size_t width;
+    size_t height;
     std::vector<uint8_t> remapTable;
     std::vector<uint8_t> data;
 };
@@ -175,16 +175,16 @@ SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
 
     input.ignore(1);
 
-    d->width = io::readLEInteger<2, std::size_t>(input);
-    d->height = io::readLEInteger<1, std::size_t>(input);
+    d->width = io::readLEInteger<2, size_t>(input);
+    d->height = io::readLEInteger<1, size_t>(input);
     d->data.reserve(d->width*d->height);
 
-    const auto frame_size = io::readLEInteger<2, std::size_t>(input);
-    const auto rle_data_size = io::readLEInteger<2, std::size_t>(input);
+    const auto frame_size = io::readLEInteger<2, size_t>(input);
+    const auto rle_data_size = io::readLEInteger<2, size_t>(input);
 
     if (frame_flags[HasRemapTable]) {                        // HasRemapTable is set
         const auto remap_size = frame_flags[CustomSizeRemap] // CustomSizeRemap is set
-            ? io::readLEInteger<1, std::size_t>(input)
+            ? io::readLEInteger<1, size_t>(input)
             : 16;
         
         for (auto i = 0; i < remap_size; ++i) {
@@ -224,18 +224,18 @@ SHP::Frame::operator=(Frame &&rhs) {
 SHP::Frame::~Frame() {
 }
 
-std::size_t
+size_t
 SHP::Frame::getWidth() const {
     return d->width;
 }
 
-std::size_t
+size_t
 SHP::Frame::getHeight() const {
     return d->height;
 }
 
-std::size_t
-SHP::Frame::getPixel(std::size_t x, std::size_t y) const {
+size_t
+SHP::Frame::getPixel(size_t x, size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());
     const auto index = d->data[y*getWidth() + x];

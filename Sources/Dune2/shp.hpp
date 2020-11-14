@@ -25,9 +25,9 @@ public:
         virtual ~Frame();
 
     public:
-        virtual std::size_t getWidth() const override;
-        virtual std::size_t getHeight() const override;
-        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
+        virtual size_t getWidth() const override;
+        virtual size_t getHeight() const override;
+        virtual size_t getPixel(size_t, size_t) const override;
     
     private:
         struct impl;

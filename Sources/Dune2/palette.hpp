@@ -20,13 +20,13 @@ public:
     Palette();
 
 public:
-    std::size_t size() const
+    size_t size() const
     { return colors_.size(); }
 
-    const Color &operator[](std::size_t index) const
+    const Color &operator[](size_t index) const
     { return colors_[index]; }
 
-    Color &operator[](std::size_t index)
+    Color &operator[](size_t index)
     { return colors_[index]; }
 
 public:

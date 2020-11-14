@@ -14,10 +14,10 @@ public:
     using iterator_category = std::input_iterator_tag;
 
 public:
-    using ItemGetter = std::function<T(std::size_t)>;
+    using ItemGetter = std::function<T(size_t)>;
 
 public:
-    Iterator(ItemGetter &&item_getter, std::size_t index)
+    Iterator(ItemGetter &&item_getter, size_t index)
         : getItem_{item_getter}
         , index_{index} {
     }
@@ -40,7 +40,7 @@ public:
 
 private:
     ItemGetter getItem_;
-    std::size_t index_{0};
+    size_t index_{0};
 };
 
 } // namespace nr::dune2

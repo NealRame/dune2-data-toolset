@@ -21,26 +21,26 @@ public:
         struct Info {
             /// #### attribute `width`
             /// The pixels width of a Tile.
-            std::size_t width;
+            size_t width;
 
             /// #### attribute `height`
             /// The pixels height of a Tile.
-            std::size_t height;
+            size_t height;
 
             /// #### attribute `bitPerPixels`
             /// The number of bits used to store one pixel.
-            std::size_t bitPerPixels;
+            size_t bitPerPixels;
 
             /// #### method `Tile.getTileSize`
             /// ##### Return
-            /// `std::size_t` - the number of bytes used to store a tile.
-            std::size_t getTileSize() const
+            /// `size_t` - the number of bytes used to store a tile.
+            size_t getTileSize() const
             { return (width*height*bitPerPixels)/8; }
 
             /// #### method `Tile.getPaletteSize`
             /// ##### Return
-            /// `std::size_t` - the number of colors used in a tile.
-            std::size_t getPaletteSize() const
+            /// `size_t` - the number of colors used in a tile.
+            size_t getPaletteSize() const
             { return 1<<bitPerPixels; }
         };
 
@@ -48,17 +48,17 @@ public:
         /// #### method `nr::dune2::Tileset::Tile.getWidth`
         /// See [`nr::dune2::Surface.getWidth`](/docs/nr/dune2/surface#getWidth)
         /// for more details.
-        virtual std::size_t getWidth() const override;
+        virtual size_t getWidth() const override;
 
         /// #### method `nr::dune2::Tileset::Tile.getHeight`
         /// See [`nr::dune2::Surface.getHeight`](/docs/nr/dune2/surface#getHeight)
         /// for more details.
-        virtual std::size_t getHeight() const override;
+        virtual size_t getHeight() const override;
 
         /// #### method `nr::dune2::Tileset::Tile.getPixel`
         /// See [`nr::dune2::Surface.getPixel`](/docs/nr/dune2/surface#getPixel)
         /// for more details.
-        virtual std::size_t getPixel(std::size_t, std::size_t) const override;
+        virtual size_t getPixel(size_t, size_t) const override;
 
     private:
         Tile(const Info &, const std::vector<uint8_t> &, const std::vector<uint8_t> &);
@@ -94,15 +94,15 @@ public:
     
     /// ### method `nr::dune2::Tileset.getTileCount`
     /// #### Return
-    /// `std::size_t` - the number of tiles.
-    std::size_t getTileCount() const;
+    /// `size_t` - the number of tiles.
+    size_t getTileCount() const;
 
     /// ### method `nr::dune2::Tileset.getTile`
     /// #### Parameters
     /// * `tile_index` - the tile index.
     /// #### Return
     /// `Tileset::Tile` - a tile _tiles[tile_index]_.
-    Tile getTile(std::size_t tile_index) const;
+    Tile getTile(size_t tile_index) const;
 
     /// ### method `nr::dune2::Tileset.tilesBegin`
     /// #### Return

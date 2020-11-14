@@ -10,8 +10,8 @@ namespace nr::dune2 {
 class PAK {
 public:
     struct Entry {
-        const std::size_t offset{0};
-        const std::size_t size{0};
+        const size_t offset{0};
+        const size_t size{0};
         const std::string name;
         const std::shared_ptr<std::string> filepath;
 
