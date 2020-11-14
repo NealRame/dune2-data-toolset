@@ -5,10 +5,11 @@ add_library(${PROJECT_NAME}
   bmp.hpp
   bswap.hpp
   color.hpp
-  icn.hpp
-  icn.cpp
+  iconset.hpp
+  iconset.cpp
   io.cpp
   io.hpp
+  iterators.hpp
   pak.cpp
   pak.hpp
   palette.cpp
@@ -16,6 +17,8 @@ add_library(${PROJECT_NAME}
   shp.cpp
   shp.hpp
   surface.hpp
+  tileset.cpp
+  tileset.hpp
 )
 target_compile_features(${PROJECT_NAME}
   PUBLIC

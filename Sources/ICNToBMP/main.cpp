@@ -1,5 +1,6 @@
 #include <Dune2/bmp.hpp>
-#include <Dune2/icn.hpp>
+#include <Dune2/iconset.hpp>
+#include <Dune2/tileset.hpp>
 
 #include <Dune2/io.hpp>
 #include <Dune2/palette.hpp>
@@ -20,6 +21,10 @@ main(int argc, char **argv) {
         ("help,h", po::bool_switch(), "Display help message and exit.")
         ("verbose,v", po::bool_switch(), "Enable verbosity.")
         (
+            "icons-tiles-map,m",
+            po::value<fs::path>(),
+            "Provide icons tiles mapping file."
+        ) (
             "output-dir,d",
             po::value<fs::path>()->default_value(fs::current_path()),
             "Set output directory."
@@ -28,13 +33,11 @@ main(int argc, char **argv) {
     po::options_description hidden;
     hidden.add_options()
         ("input-pal-file", po::value<fs::path>(), "PAL file path.")
-        ("input-map-file", po::value<fs::path>(), "MAP file path.")
         ("input-icn-file", po::value<fs::path>(), "ICN file path.");
 
     po::positional_options_description args;
     args
         .add("input-pal-file", 1)
-        .add("input-map-file", 1)
         .add("input-icn-file", 1);
 
     po::options_description cli;
@@ -77,13 +80,6 @@ main(int argc, char **argv) {
         return 0;
     }
 
-    if (vm.count("input-map-file") == 0) {
-        std::cerr << "MAP file path is missing!" << std::endl
-            << usage
-            << std::endl;
-        return 1;
-    }
-
     if (vm.count("input-icn-file") == 0) {
         std::cerr << "ICN file path is missing!" << std::endl
             << usage
@@ -104,20 +100,31 @@ main(int argc, char **argv) {
         return 1;
     }
 
-    const auto icn = nr::dune2::ICN::load(
-        vm["input-map-file"].as<fs::path>(),
-        vm["input-icn-file"].as<fs::path>(),
-        *pal
-    );
-    if (!icn) {
+    const auto tileset = nr::dune2::Tileset::load(vm["input-icn-file"].as<fs::path>(), *pal);
+    if (!tileset) {
         std::cerr << "Cannot load ICN file!" << std::endl;
         return 1;
     }
 
-    for (auto &&surface: icn->icons()) {
-        nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
-        bmp.drawSurface(0, 0, surface);
-        bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
+    if (vm.count("icons-tiles-map") == 0) {
+        for (auto &&surface: *tileset) {
+            nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
+            bmp.drawSurface(0, 0, surface);
+            bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
+        }
+        return 0;
+    }
+    
+    const auto iconset = nr::dune2::Iconset::load(vm["icons-tiles-map"].as<fs::path>(), *tileset);
+    if (!iconset) {
+        std::cerr << "Cannot load MAP file!" << std::endl;
+        return 1;
+    } else {
+        for (auto &&surface: *iconset) {
+            nr::dune2::BMP bmp(surface.getWidth(), surface.getHeight());
+            bmp.drawSurface(0, 0, surface);
+            bmp.store(vm["output-dir"].as<fs::path>()/output_file_name());
+        }
     }
 
     return 0;
