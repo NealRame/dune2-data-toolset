@@ -4,20 +4,22 @@ add_library(${PROJECT_NAME}
   bmp.cpp
   bmp.hpp
   bswap.hpp
-  iconset.hpp
-  iconset.cpp
   io.cpp
   io.hpp
-  iterators.hpp
   pak.cpp
   pak.hpp
   palette.cpp
   palette.hpp
-  shp.cpp
-  shp.hpp
+  resource.cpp
+  resource.hpp
   surface.hpp
   tileset.cpp
+  tileset_load_from_icn.cpp
+  tileset_load_from_shp.cpp
   tileset.hpp
+)
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES CXX_VISIBILITY_PRESET hidden
 )
 target_compile_features(${PROJECT_NAME}
   PUBLIC
@@ -37,3 +39,7 @@ if(ADDRESS_SANITIZER)
       -fno-omit-frame-pointer -fsanitize=address
   )
 endif()
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC
+    Dune2RC
+)

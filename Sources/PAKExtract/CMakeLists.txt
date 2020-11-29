@@ -8,8 +8,9 @@ target_compile_features(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
-    dune2
-    CONAN_PKG::boost
+    Dune2
+    CONAN_PKG::cli11
+    CONAN_PKG::fmt
 )
 set_target_properties(${PROJECT_NAME}
   PROPERTIES CXX_VISIBILITY_PRESET hidden

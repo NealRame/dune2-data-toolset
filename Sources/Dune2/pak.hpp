@@ -19,7 +19,7 @@ public:
     };
 
 public:
-    static std::optional<PAK> load(const std::string &filepath);
+    void load(const std::string &filepath);
 
 public:
     using const_iterator = std::vector<Entry>::const_iterator;

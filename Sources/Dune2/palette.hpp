@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <optional>
 #include <string>
 #include <vector>
@@ -7,27 +8,38 @@
 namespace nr::dune2 {
 class Palette {
 public:
-    static std::optional<Palette> load(const std::string &filepath);
-
-public:
     struct Color {
-        uint8_t red{0};
-        uint8_t green{0};
-        uint8_t blue{0};
+        using Channel = uint8_t;
+        static constexpr Channel ChannelMax = std::numeric_limits<Channel>::max();
+        Channel red{0};
+        Channel green{0};
+        Channel blue{0};
     };
 
 public:
-    Palette();
+    Palette(const std::string &name);
+
+public:
+    void load(const std::string &filepath);
+
+public:
+    const std::string &getName() const;
 
 public:
     size_t size() const
     { return colors_.size(); }
 
-    const Color &operator[](size_t index) const
+    const Color &at(size_t index) const
     { return colors_[index]; }
 
-    Color &operator[](size_t index)
+    Color &at(size_t index)
     { return colors_[index]; }
+
+    const Color &operator[](size_t index) const
+    { return at(index); }
+
+    Color &operator[](size_t index)
+    { return at(index); }
 
 public:
     using iterator = std::vector<Color>::iterator;
@@ -46,6 +58,7 @@ public:
     { return const_cast<Palette &>(*this).end(); }
 
 private:
+    std::string name_;
     std::vector<Color> colors_;
 };
 }

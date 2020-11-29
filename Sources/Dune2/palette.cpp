@@ -4,41 +4,39 @@
 
 #include <fstream>
 
-namespace std {
-
-std::istream &
-operator>>(std::istream &input, nr::dune2::Palette::Color &color) {
-    using nr::dune2::io::readLEInteger;
-    if (input) {
-        color.red = readLEInteger<1, uint8_t>(input)*4;
-        color.green = readLEInteger<1, uint8_t>(input)*4;
-        color.blue = readLEInteger<1, uint8_t>(input)*4;
-    }
-    return input;
-}
-
-} // namespace std
-
-
 namespace nr::dune2 {
 
-Palette::Palette()
-    : colors_(256) {
+Palette::Palette(const std::string &name)
+    : colors_(256)
+    , name_{name} {
 }
 
-std::optional<Palette>
+const std::string &
+Palette::getName() const {
+    return name_;
+}
+
+void
 Palette::load(const std::string &filepath) {
-    std::fstream input(filepath, std::ios::binary|std::ios::in);
+    std::ifstream input;
 
-    auto palette = std::make_optional<Palette>();
+    input.exceptions(std::ifstream::failbit);
+    input.open(filepath, std::ios::binary);
 
-    std::copy(
-        std::istream_iterator<Color>(input),
-        std::istream_iterator<Color>(),
-        palette->colors_.begin()
+    std::generate(
+        colors_.begin(),
+        colors_.end(),
+        [&] {
+            using nr::dune2::io::readLEInteger;
+            Color color;
+
+            color.red   = readLEInteger<1, uint8_t>(input)*4;
+            color.green = readLEInteger<1, uint8_t>(input)*4;
+            color.blue  = readLEInteger<1, uint8_t>(input)*4;
+
+            return color;
+        }
     );
-
-    return palette;
 }
 
 } // namespace nr::dune2

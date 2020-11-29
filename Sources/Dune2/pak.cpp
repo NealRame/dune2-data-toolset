@@ -38,11 +38,11 @@ namespace nr::dune2 {
 ///////////////////////////////////////////////////////////////////////////////
 // PAK
 
-std::optional<PAK>
+void
 PAK::load(const std::string &filepath) {
-    std::fstream input(filepath, std::fstream::in|std::fstream::binary);
+    std::ifstream input;
 
-    if (!input) return std::nullopt;
+    input.open(filepath, std::ios::binary);
 
     std::vector<PAKRawEntry> raw_entries;
     std::copy(
@@ -51,12 +51,11 @@ PAK::load(const std::string &filepath) {
         std::back_inserter(raw_entries)
     );
 
-    auto pak = std::make_optional<PAK>();
     std::transform(
         std::begin(raw_entries),
         std::end(raw_entries) - 1,
         std::begin(raw_entries) + 1,
-        std::back_inserter(pak->entries_),
+        std::back_inserter(entries_),
         [&](const auto &raw_entry1, const auto &raw_entry2) {
             return Entry{
                 .offset   = raw_entry1.first,
@@ -66,8 +65,6 @@ PAK::load(const std::string &filepath) {
             };
         }
     );
-
-    return pak;
 }
 
 PAK::const_iterator
@@ -96,7 +93,7 @@ PAK::cend() const {
 std::string
 PAK::Entry::read() const {
     std::string buf(size, 0);
-    std::ifstream input(*filepath, std::ifstream::in|std::ifstream::binary);
+    std::ifstream input(*filepath, std::ifstream::binary);
     input.seekg(offset);
     input.read(buf.data(), buf.size());
     return buf;

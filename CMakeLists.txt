@@ -8,6 +8,10 @@ include(Conan)
 include(Utils)
 
 conan_env(VERSION 1.30.2)
+conan_add_remote(
+  NAME bincrafters
+  URL "https://api.bintray.com/conan/bincrafters/public-conan"
+)
 conan_setup(
   CONANFILE ${CMAKE_SOURCE_DIR}/conanfile.txt
   CMAKE_TARGETS
@@ -17,10 +21,10 @@ conan_setup(
 option(ADDRESS_SANITIZER "Enable/Disable address sanitizer" OFF)
 
 add_subdirectory(Sources/Dune2)
+add_subdirectory(Sources/Dune2RC)
+add_subdirectory(Sources/RCToolkit)
 add_subdirectory(Sources/PAKExtract)
-add_subdirectory(Sources/ICNToBMP)
-add_subdirectory(Sources/PALToBMP)
-add_subdirectory(Sources/SHPToBMP)
+
 nr_get_all_targets(TARGETS)
 foreach(target ${TARGETS})
   get_property(target_type TARGET "${target}" PROPERTY TYPE)
@@ -31,4 +35,3 @@ foreach(target ${TARGETS})
     nr_set_target_output_name(${target} PREFIX dune2)
   endif()
 endforeach()
-

@@ -82,6 +82,7 @@ readData(std::istream &input, size_t count) {
 }
 
 std::string readString(std::istream &);
+std::string readString(std::istream &, size_t);
 
 class OPosOffsetGuard {
     std::ostream &output_;

@@ -1,26 +1,32 @@
-#include "shp.hpp"
+#include "tileset.hpp"
 #include "io.hpp"
 
-#include <bitset>
+#include <stdexcept>
 #include <fstream>
+#include <iostream>
 
 namespace nr::dune2 {
 
 namespace {
 
-SHP::Version
-shp_read_version(std::fstream &input) {
+enum class SHPVersion {
+    v100 = 100,
+    v107 = 107,
+};
+
+SHPVersion
+shp_read_version(std::ifstream &input) {
     io::IPosOffsetGuard _(input);
     input.seekg(4);
     return nr::dune2::io::readLEInteger<2>(input) != 0
-        ? SHP::v100
-        : SHP::v107;
+        ? SHPVersion::v100
+        : SHPVersion::v107;
 }
 
-template<SHP::Version V>
+template<SHPVersion V>
 std::istream::pos_type
 shp_read_frame_offset(std::istream &input) {
-    if constexpr(V == SHP::v100) {
+    if constexpr(V == SHPVersion::v100) {
         return io::readLEInteger<2, std::uint16_t>(input);
     } else {
         return io::readLEInteger<4, std::uint32_t>(input) + 2;
@@ -28,16 +34,16 @@ shp_read_frame_offset(std::istream &input) {
 }
 
 std::vector<std::istream::pos_type>
-shp_read_frame_offsets(std::istream &input, SHP::Version version) {
+shp_read_frame_offsets(std::istream &input, SHPVersion version) {
     std::vector<std::istream::pos_type> offsets;
     const auto frame_count = io::readLEInteger<2, unsigned int>(input);
     std::generate_n(
         std::back_inserter(offsets),
         frame_count,
         [&]() {
-            return version == SHP::v100
-                ? shp_read_frame_offset<SHP::v100>(input)
-                : shp_read_frame_offset<SHP::v107>(input);
+            return version == SHPVersion::v100
+                ? shp_read_frame_offset<SHPVersion::v100>(input)
+                : shp_read_frame_offset<SHPVersion::v107>(input);
         }
     );
     return offsets;
@@ -113,58 +119,8 @@ shp_lcw_deflate(std::istream &input, size_t size, std::vector<uint8_t> &dst) {
     }
 }
 
-} // namespace
-
-std::optional<SHP>
-SHP::load(const std::string &filepath) {
-    std::fstream input(filepath, std::ios::binary|std::ios::in);
-
-    auto shp = std::make_optional<SHP>();
-
-    const auto version = shp_read_version(input);
-    const auto offsets = shp_read_frame_offsets(input, version);
-
-    std::transform(
-        offsets.begin(),
-        offsets.end(),
-        std::back_inserter(shp->frames_),
-        [&](const auto pos) {
-            return std::move(Frame(input, pos));
-        }
-    );
-
-    return shp;
-}
-
-SHP::const_iterator
-SHP::begin() const {
-    return frames_.begin();
-}
-
-SHP::const_iterator
-SHP::end() const {
-    return frames_.end();
-}
-
-SHP::const_iterator
-SHP::cbegin() const {
-    return begin();
-}
-
-SHP::const_iterator
-SHP::cend() const {
-    return end();
-}
-
-struct SHP::Frame::impl {
-    size_t width;
-    size_t height;
-    std::vector<uint8_t> remapTable;
-    std::vector<uint8_t> data;
-};
-
-SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
-    : d{std::make_unique<Frame::impl>()} {
+Tileset::Tile
+read_shp_tile(std::istream &input, std::istream::pos_type pos) {
     input.seekg(pos);
 
     std::bitset<16> frame_flags(io::readLEInteger<2>(input));
@@ -175,9 +131,11 @@ SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
 
     input.ignore(1);
 
-    d->width = io::readLEInteger<2, size_t>(input);
-    d->height = io::readLEInteger<1, size_t>(input);
-    d->data.reserve(d->width*d->height);
+    auto width = io::readLEInteger<2, size_t>(input);
+    auto height = io::readLEInteger<1, size_t>(input);
+
+    std::string data;
+    std::string data_remap_table;
 
     const auto frame_size = io::readLEInteger<2, size_t>(input);
     const auto rle_data_size = io::readLEInteger<2, size_t>(input);
@@ -187,9 +145,7 @@ SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
             ? io::readLEInteger<1, size_t>(input)
             : 16;
         
-        for (auto i = 0; i < remap_size; ++i) {
-            d->remapTable.push_back(io::readLEInteger<1, std::uint8_t>(input));
-        }
+        data_remap_table = io::readString(input, remap_size);
     }
 
     const auto frame_data_size = frame_size - (input.tellg() - pos);
@@ -207,41 +163,32 @@ SHP::Frame::Frame(std::istream &input, std::istream::pos_type pos)
         const auto n = it - rle_data.begin();
         const auto value = *it++;
         const auto count = (value == 0 ? *it++ : 1);
-        d->data.insert(d->data.end(), count, value);
+        data.insert(data.end(), count, value);
     }
+
+    return Tileset::Tile(width, height, std::move(data), std::move(data_remap_table));
 }
 
-SHP::Frame::Frame(Frame &&rhs) {
-    *this = std::move(rhs);
-}
+} // namespace
 
-SHP::Frame &
-SHP::Frame::operator=(Frame &&rhs) {
-    d = std::move(rhs.d);
-    return *this;
-}
+void
+Tileset::loadFromSHP(const std::string &shp_path) {
+    std::ifstream input;
 
-SHP::Frame::~Frame() {
-}
+    input.open(shp_path, std::ios::binary);
+    input.exceptions(std::ios::failbit);
 
-size_t
-SHP::Frame::getWidth() const {
-    return d->width;
-}
+    const auto version = shp_read_version(input);
+    const auto offsets = shp_read_frame_offsets(input, version);
 
-size_t
-SHP::Frame::getHeight() const {
-    return d->height;
-}
-
-size_t
-SHP::Frame::getPixel(size_t x, size_t y) const {
-    assert(x < getWidth());
-    assert(y < getHeight());
-    const auto index = d->data[y*getWidth() + x];
-    return d->remapTable.size() > 0
-        ? d->remapTable[index]
-        : index;
+    std::transform(
+        offsets.begin(),
+        offsets.end(),
+        std::back_inserter(tiles_),
+        [&](const auto pos) {
+            return read_shp_tile(input, pos);
+        }
+    );
 }
 
 } // namespace nr::dune2

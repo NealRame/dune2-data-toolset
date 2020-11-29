@@ -1,5 +1,10 @@
 [requires]
-boost/1.74.0
+cli11/1.9.1
+fmt/7.1.2
+protobuf/3.9.1
+protoc_installer/3.9.1@bincrafters/stable
 
 [generators]
 cmake
+cmake_paths
+virtualrunenv

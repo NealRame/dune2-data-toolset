@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package nr.dune2.rc;
+
+message Data {
+    message Palette {
+        message Color {
+            float red = 1;
+            float green = 2;
+            float blue = 3;
+            float alpha = 4;
+        }
+        repeated Color colors = 1;
+    }
+    
+    message Tileset {
+        message Tile {
+            uint32 width = 1;
+            uint32 height = 2;
+            bytes pixels = 3;
+            bytes remapTable = 4;
+        }
+        repeated Tile tiles = 1;
+    }
+
+    map<string, Palette> palettes = 1;
+    map<string, Tileset> tilesets = 2;
+}

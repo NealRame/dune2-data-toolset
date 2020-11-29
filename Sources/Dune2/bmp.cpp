@@ -56,7 +56,7 @@ void
 BMP::drawSurface(
     size_t x, size_t y,
     const Surface &surface,
-    const Palette & palette) {
+    const Palette &palette) {
     const auto w = std::min(surface.getWidth(), width_ - x);
     const auto h = std::min(surface.getHeight(), height_ - y);
     for (auto sx = 0; sx < w; ++sx) {
