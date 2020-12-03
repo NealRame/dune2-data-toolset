@@ -1,7 +1,12 @@
 #include <app.hpp>
 
+#include <Dune2/resource.hpp>
+
+#include <fmt/format.h>
+
 CLI::App_p createTilesetCommands(AppState &);
 CLI::App_p createPaletteCommands(AppState &);
+CLI::App_p createSoundsetCommands(AppState &);
 
 int
 main(int argc, char const *argv[]) {
@@ -22,8 +27,18 @@ main(int argc, char const *argv[]) {
     app.require_subcommand(1);
     app.add_subcommand(createPaletteCommands(app_state));
     app.add_subcommand(createTilesetCommands(app_state));
+    app.add_subcommand(createSoundsetCommands(app_state));
 
-    CLI11_PARSE(app, argc, argv);
+    try {
+        app.parse((argc), (argv));
+    } catch (const CLI::Error &e) {
+        return app.exit(e);
+    } catch (const nr::dune2::Resource::ResourceNotFound &e) {
+        return app.exit(CLI::Error(
+            "ResourceNotFound",
+            fmt::format("Resource '{}' not found", e.name)
+        ));
+    }
 
     return 0;
 }

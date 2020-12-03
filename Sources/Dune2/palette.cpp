@@ -6,14 +6,8 @@
 
 namespace nr::dune2 {
 
-Palette::Palette(const std::string &name)
-    : colors_(256)
-    , name_{name} {
-}
-
-const std::string &
-Palette::getName() const {
-    return name_;
+Palette::Palette()
+    : colors_(256) {
 }
 
 void

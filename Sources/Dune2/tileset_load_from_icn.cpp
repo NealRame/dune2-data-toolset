@@ -9,7 +9,6 @@ namespace nr::dune2 {
 
 namespace {
 
-
 struct ICNInfo {
     /// #### attribute `width`
     /// The pixels width of a Tile.

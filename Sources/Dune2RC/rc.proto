@@ -23,6 +23,15 @@ message Data {
         repeated Tile tiles = 1;
     }
 
+    message Soundset {
+        message Sound {
+            string name = 1;
+            bytes data = 2;
+        }
+        repeated Sound sounds = 1;
+    }
+
     map<string, Palette> palettes = 1;
     map<string, Tileset> tilesets = 2;
+    map<string, Soundset> soundsets = 3;
 }

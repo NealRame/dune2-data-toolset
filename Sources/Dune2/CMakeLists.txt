@@ -42,4 +42,5 @@ endif()
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
     Dune2RC
+    CONAN_PKG::fmt
 )

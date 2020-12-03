@@ -1,9 +1,13 @@
 project(RCToolkit)
 
+nr_case_camel_to_snake("${PROJECT_NAME}" TARGET_OUTPUT_NAME)
+
 add_executable(${PROJECT_NAME}
+  app.cpp
   app.hpp
   main.cpp
   commands/palette.cpp
+  commands/soundset.cpp
   commands/tileset.cpp
 )
 target_compile_features(${PROJECT_NAME}
@@ -20,7 +24,9 @@ target_link_libraries(${PROJECT_NAME}
     CONAN_PKG::fmt
 )
 set_target_properties(${PROJECT_NAME}
-  PROPERTIES CXX_VISIBILITY_PRESET hidden
+  PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    OUTPUT_NAME "dune2-${TARGET_OUTPUT_NAME}"
 )
 install(
   TARGETS ${PROJECT_NAME}

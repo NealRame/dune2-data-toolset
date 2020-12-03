@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <istream>
-#include <optional>
 #include <utility>
 
 namespace {

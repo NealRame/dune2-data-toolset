@@ -1,7 +1,6 @@
 #pragma once
 
 #include <limits>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -17,13 +16,10 @@ public:
     };
 
 public:
-    Palette(const std::string &name);
+    Palette();
 
 public:
     void load(const std::string &filepath);
-
-public:
-    const std::string &getName() const;
 
 public:
     size_t size() const
@@ -58,7 +54,6 @@ public:
     { return const_cast<Palette &>(*this).end(); }
 
 private:
-    std::string name_;
     std::vector<Color> colors_;
 };
 }

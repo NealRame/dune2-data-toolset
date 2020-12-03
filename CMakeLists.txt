@@ -24,14 +24,4 @@ add_subdirectory(Sources/Dune2)
 add_subdirectory(Sources/Dune2RC)
 add_subdirectory(Sources/RCToolkit)
 add_subdirectory(Sources/PAKExtract)
-
-nr_get_all_targets(TARGETS)
-foreach(target ${TARGETS})
-  get_property(target_type TARGET "${target}" PROPERTY TYPE)
-
-  message(DEBUG "target ${target} type is ${target_type}")
-
-  if("${target_type}" STREQUAL "EXECUTABLE")
-    nr_set_target_output_name(${target} PREFIX dune2)
-  endif()
-endforeach()
+add_subdirectory(Sources/VOCBatchConvert)

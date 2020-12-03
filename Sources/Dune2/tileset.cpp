@@ -35,10 +35,6 @@ Tileset::Tile::hasRemapTable() const {
     return dataRemapTable_.size() > 0;
 }
 
-Tileset::Tileset(const std::string &name)
-    : name_{name} {
-}
-
 size_t
 Tileset::getTileCount() const {
     return tiles_.size();

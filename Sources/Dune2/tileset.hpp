@@ -3,7 +3,6 @@
 // #include <Dune2/iterators.hpp>
 #include <Dune2/surface.hpp>
 
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -77,12 +76,6 @@ public:
     /// ### class `nr::dune2::Tileset::TileIterator`
     /// An input iterator to iterate throught tiles.
     using TileIterator = std::vector<Tile>::const_iterator;
-
-public:
-    /// ### constructor `nr::dune2::Tileset`
-    /// #### Parameters
-    /// - `const std::string &name` - the name of the tileset
-    Tileset(const std::string &name);
 
 public:
     /// ### method `nr::dune2::Tileset::loadFromICN`

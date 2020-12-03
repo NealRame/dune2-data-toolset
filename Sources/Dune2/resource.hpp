@@ -10,6 +10,19 @@ namespace nr::dune2 {
 
 class Resource {
 public:
+    struct PaletteAlreadyExistError: public std::exception {};
+    struct ResourceNotFound: public std::exception {
+        const std::string name;
+
+        ResourceNotFound(const std::string &name)
+            : name{name} {
+        }
+
+        virtual const char *what() const noexcept override
+        { return name.c_str(); }
+    };
+
+public:
     Resource();
     virtual ~Resource();
 
@@ -18,13 +31,25 @@ public:
     struct deserialization_failure : public std::exception { };
 
 public:
-    void addPalette(const Palette &);
-    std::optional<Palette> getPalette(const std::string &) const;
+    Palette getPalette(const std::string &) const;
     std::vector<std::string> getPaletteList() const;
+    bool hasPalette(const std::string &) const;
+    void removePalette(const std::string &);
+    void importPalette(const std::string &, const std::filesystem::path &);
 
-    void addTileset(const Tileset &);
-    std::optional<Tileset> getTileset(const std::string &) const;
+    Tileset getTileset(const std::string &name) const;
     std::vector<std::string> getTilesetList() const;
+    bool hasTileset(const std::string &name) const;
+    void createTileset(const std::string &name);
+    void removeTileset(const std::string &name);
+    void importTileset(const std::string &name, const std::filesystem::path &);
+
+    std::vector<std::string> getSoundsetList() const;
+    std::vector<std::string> getSoundList(const std::string &name) const;
+    bool hasSoundset(const std::string &name) const;
+    void createSoundset(const std::string &name);
+    void removeSoundset(const std::string &name);
+    void addSound(const std::string &soundset, const std::filesystem::path &filepath);
 
 public:
     void deserialize(const std::filesystem::path &);

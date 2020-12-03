@@ -5,7 +5,6 @@
 #include <array>
 #include <functional>
 #include <istream>
-#include <optional>
 #include <string_view>
 
 namespace nr::dune2::io {
