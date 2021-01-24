@@ -21,7 +21,6 @@ conan_setup(
 option(ADDRESS_SANITIZER "Enable/Disable address sanitizer" OFF)
 
 add_subdirectory(Sources/Dune2)
-add_subdirectory(Sources/Dune2RC)
 add_subdirectory(Sources/RCToolkit)
 add_subdirectory(Sources/PAKExtract)
 add_subdirectory(Sources/VOCBatchConvert)
