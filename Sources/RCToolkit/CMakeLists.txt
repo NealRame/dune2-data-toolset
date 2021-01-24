@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME}
   main.cpp
   commands/palette.cpp
   commands/soundset.cpp
+  commands/iconset.cpp
   commands/tileset.cpp
 )
 target_compile_features(${PROJECT_NAME}

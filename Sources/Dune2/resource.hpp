@@ -2,6 +2,7 @@
 
 #include <Dune2/palette.hpp>
 #include <Dune2/tileset.hpp>
+#include <Dune2/iconset.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -43,6 +44,13 @@ public:
     void createTileset(const std::string &name);
     void removeTileset(const std::string &name);
     void importTileset(const std::string &name, const std::filesystem::path &);
+
+    Iconset getIconset(const std::string &name) const;
+    std::vector<std::string> getIconsetList() const;
+    bool hasIconset(const std::string &name) const;
+    void createIconset(const std::string &name);
+    void removeIconset(const std::string &name);
+    void importIconset(const std::string &name, const std::filesystem::path &);
 
     std::vector<std::string> getSoundsetList() const;
     std::vector<std::string> getSoundList(const std::string &name) const;

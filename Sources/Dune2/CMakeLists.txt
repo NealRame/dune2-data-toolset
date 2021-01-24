@@ -17,6 +17,9 @@ add_library(${PROJECT_NAME}
   tileset_load_from_icn.cpp
   tileset_load_from_shp.cpp
   tileset.hpp
+  iconset.hpp
+  iconset.cpp
+  iconset_load_from_map.cpp
 )
 set_target_properties(${PROJECT_NAME}
   PROPERTIES CXX_VISIBILITY_PRESET hidden

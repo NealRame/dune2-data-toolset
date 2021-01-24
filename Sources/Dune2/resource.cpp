@@ -73,7 +73,7 @@ Resource::importPalette(
 
 Palette
 Resource::getPalette(const std::string &name) const {
-    if (d->rc.palettes().contains(name)) {
+    if (!d->rc.palettes().contains(name)) {
         throw ResourceNotFound(name);
     }
 
@@ -110,8 +110,8 @@ Resource::hasTileset(const std::string &name) const {
 void
 Resource::createTileset(const std::string &name) {
     if (!d->rc.tilesets().contains(name)) {
-        auto &tileset = *d->rc.mutable_tilesets();
-        tileset[name] = nr::dune2::rc::Data::Tileset();
+        auto &tilesets = *d->rc.mutable_tilesets();
+        tilesets[name] = nr::dune2::rc::Data::Tileset();
     }
 }
 
@@ -193,6 +193,77 @@ Resource::getSoundList(const std::string &name) const {
         }
     }
     return sounds;
+}
+
+
+Iconset
+Resource::getIconset(const std::string &name) const {
+    if (!d->rc.iconsets().contains(name)) {
+        throw ResourceNotFound(name);
+    }
+    
+    const auto pb_iconset = d->rc.iconsets().at(name);
+    Iconset tileset;
+
+    for (auto i = 0; i < pb_iconset.icons_size(); ++i) {
+        const auto pb_icon = pb_iconset.icons(i);
+        const auto indexes = pb_icon.tiles();
+
+        tileset.push_back(Iconset::Icon(
+            pb_icon.columns(),
+            pb_icon.rows(),
+            Iconset::Icon::TileIndexList(indexes.begin(), indexes.end())
+        ));
+    }
+
+    return tileset;
+}
+
+std::vector<std::string>
+Resource::getIconsetList() const {
+    std::vector<std::string> iconsets;
+    for (auto &&item: d->rc.iconsets()) {
+        iconsets.push_back(item.first);
+    }
+    return iconsets;
+}
+
+bool
+Resource::hasIconset(const std::string &name) const {
+    return d->rc.iconsets().contains(name);
+}
+
+void
+Resource::createIconset(const std::string &name) {
+    if (!d->rc.iconsets().contains(name)) {
+        auto &iconsets = *d->rc.mutable_iconsets();
+        iconsets[name] = nr::dune2::rc::Data::Iconset();
+    }
+}
+
+void
+Resource::removeIconset(const std::string &name) {
+    d->rc.mutable_iconsets()->erase(name);
+}
+
+void
+Resource::importIconset(
+    const std::string &name,
+    const std::filesystem::path &filepath) {
+    auto &pb_iconset = d->rc.mutable_iconsets()->at(name);
+    Iconset iconset;
+
+    iconset.loadFromMAP(filepath);
+
+    for (auto &&icon: iconset) {
+        auto pb_icon = pb_iconset.add_icons();
+
+        pb_icon->set_columns(icon.getColumnCount());
+        pb_icon->set_rows(icon.getRowCount());
+        for (auto &&tile_index: icon.getTileIndexList()) {
+            pb_icon->add_tiles(tile_index);
+        }
+    }
 }
 
 bool

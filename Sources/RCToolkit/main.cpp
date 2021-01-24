@@ -4,9 +4,11 @@
 
 #include <fmt/format.h>
 
-CLI::App_p createTilesetCommands(AppState &);
 CLI::App_p createPaletteCommands(AppState &);
+CLI::App_p createTilesetCommands(AppState &);
+CLI::App_p createIconsetCommands(AppState &);
 CLI::App_p createSoundsetCommands(AppState &);
+
 
 int
 main(int argc, char const *argv[]) {
@@ -27,6 +29,7 @@ main(int argc, char const *argv[]) {
     app.require_subcommand(1);
     app.add_subcommand(createPaletteCommands(app_state));
     app.add_subcommand(createTilesetCommands(app_state));
+    app.add_subcommand(createIconsetCommands(app_state));
     app.add_subcommand(createSoundsetCommands(app_state));
 
     try {
