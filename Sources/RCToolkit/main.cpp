@@ -16,7 +16,7 @@ main(int argc, char const *argv[]) {
     AppState app_state;
 
     app.add_option(
-        "-i,--dune2-rc-file",
+        "-i,--rc-file",
         app_state.dune2RCPath,
         "A Dune2 resource file"
     );

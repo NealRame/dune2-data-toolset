@@ -21,7 +21,7 @@ add_sounds_to_soundset(
 }
 
 CLI::App_p
-create_add_command(AppState &app_state) {
+create_import_command(AppState &app_state) {
     struct CmdState {
         bool force{false};
         std::optional<std::string> name;
@@ -31,8 +31,8 @@ create_add_command(AppState &app_state) {
     auto cmd = std::make_shared<App>();
     auto cmd_state = std::make_shared<CmdState>();
 
-    cmd->name("add");
-    cmd->description("Add a soundset to resources");
+    cmd->name("import");
+    cmd->description("Import a soundset to resources");
     cmd->add_flag_function(
         "-f,--force",
         [cmd_state](auto count) {
@@ -142,7 +142,7 @@ createSoundsetCommands(AppState &app_state) {
     cmd->name("soundset");
     cmd->description("Soundset commands");
     cmd->require_subcommand(1);
-    cmd->add_subcommand(create_add_command(app_state));
+    cmd->add_subcommand(create_import_command(app_state));
     cmd->add_subcommand(create_list_command(app_state));
     cmd->add_subcommand(create_remove_command(app_state));
 
