@@ -3,7 +3,7 @@ project(VOCBatchConvert)
 nr_case_camel_to_snake("${PROJECT_NAME}" TARGET_OUTPUT_NAME)
 
 install(
-  FILES "${CMAKE_CURRENT_SOURCE_DIR}/voc-batch-convert"
+  FILES "${CMAKE_CURRENT_SOURCE_DIR}/main.sh"
   TYPE BIN
   PERMISSIONS
     OWNER_READ OWNER_WRITE OWNER_EXECUTE
