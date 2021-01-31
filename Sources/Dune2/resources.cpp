@@ -1,7 +1,7 @@
-#include "resource.hpp"
+#include "resources.hpp"
 #include "io.hpp"
 
-#include <dune2_rc.pb.h>
+#include <resources.pb.h>
 
 #include <fmt/format.h>
 

@@ -2,8 +2,8 @@ project(Dune2)
 
 set(DUNE2_RC_PB_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 list(APPEND DUNE2_RC_PB_SOURCES
-  "${DUNE2_RC_PB_DIR}/dune2_rc.pb.cc"
-  "${DUNE2_RC_PB_DIR}/dune2_rc.pb.h"
+  "${DUNE2_RC_PB_DIR}/resources.pb.cc"
+  "${DUNE2_RC_PB_DIR}/resources.pb.h"
 )
 
 add_custom_command(
@@ -31,8 +31,8 @@ add_library(${PROJECT_NAME} EXCLUDE_FROM_ALL
   pak.hpp
   palette.cpp
   palette.hpp
-  resource.cpp
-  resource.hpp
+  resources.cpp
+  resources.hpp
   surface.hpp
   tileset.cpp
   tileset_load_from_icn.cpp

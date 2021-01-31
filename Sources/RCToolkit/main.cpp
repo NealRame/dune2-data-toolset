@@ -1,7 +1,5 @@
 #include <app.hpp>
 
-#include <Dune2/resource.hpp>
-
 #include <fmt/format.h>
 
 CLI::App_p createPaletteCommands(AppState &);

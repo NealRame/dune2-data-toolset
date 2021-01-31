@@ -1,10 +1,10 @@
 find_program(PROTOC_BIN protoc REQUIRED)
 
-set(DUNE2_RC_PROTO "dune2_rc.proto")
+set(DUNE2_RC_PROTO "resources.proto")
 set(DUNE2_RC_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(DUNE2_RC "dune2.rc")
-set(DUNE2_RC_PB_JS "dune2_rc_pb.js")
+set(DUNE2_RC_PB_JS "resources_pb.js")
 
 add_subdirectory(PAKExtract)
 add_subdirectory(Dune2)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Dune2/resource.hpp>
+#include <Dune2/resources.hpp>
 
 #include <CLI/CLI.hpp>
 
