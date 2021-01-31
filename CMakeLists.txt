@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(Dune2DataToolset )
+project(Dune2DataToolset)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Scripts/CMake")
 
@@ -20,8 +20,6 @@ conan_setup(
 
 option(ADDRESS_SANITIZER "Enable/Disable address sanitizer" OFF)
 
-add_subdirectory(Sources/Dune2)
-add_subdirectory(Sources/PAKExtract)
-add_subdirectory(Sources/RCToolkit)
-add_subdirectory(Sources/RCGenerator)
-add_subdirectory(Sources/VOCBatchConvert)
+set(DUNE2_DATA_ARCHIVE "${CMAKE_SOURCE_DIR}/Dune2Data.zip" CACHE FILEPATH "Path to Dune2 data archive.")
+
+add_subdirectory(Sources)

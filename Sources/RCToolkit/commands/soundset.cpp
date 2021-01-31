@@ -4,6 +4,10 @@
 
 #include <fmt/format.h>
 
+#include <regex>
+
+namespace fs = std::filesystem;
+
 namespace {
 
 void
@@ -11,12 +15,16 @@ add_sounds_to_soundset(
     nr::dune2::Resource &rc,
     const std::string &soundset,
     const fs::path &source) {
+
     if (fs::is_directory(source)) {
         for (auto &&entry: fs::directory_iterator(source)) {
             add_sounds_to_soundset(rc, soundset, entry);
         }
     } else {
-        rc.addSound(soundset, source);
+        const auto ext = source.extension().string();
+        if (std::regex_match(ext, std::regex(R"re(\.mp3$)re"))) {
+            rc.addSound(soundset, source);
+        }
     }
 }
 
