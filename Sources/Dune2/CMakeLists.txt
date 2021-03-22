@@ -33,6 +33,7 @@ add_library(${PROJECT_NAME} EXCLUDE_FROM_ALL
   palette.hpp
   resources.cpp
   resources.hpp
+  resources_json_export.cpp
   surface.hpp
   tileset.cpp
   tileset_load_from_icn.cpp
@@ -67,6 +68,7 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
     CONAN_PKG::fmt
     CONAN_PKG::protobuf
+    CONAN_PKG::rapidjson
 )
 
 set_property(

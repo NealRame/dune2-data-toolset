@@ -63,6 +63,9 @@ public:
     void deserialize(const std::filesystem::path &);
     void serialize(const std::filesystem::path &) const;
 
+public:
+    void json_export(const std::filesystem::path &) const;
+
 private:
     struct impl;
     std::unique_ptr<impl> d;
