@@ -7,7 +7,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Scripts/CMake")
 include(Conan)
 include(Utils)
 
-conan_env(VERSION 1.30.2)
+conan_env(VERSION 1.34.1)
 conan_add_remote(
   NAME bincrafters
   URL "https://api.bintray.com/conan/bincrafters/public-conan"
