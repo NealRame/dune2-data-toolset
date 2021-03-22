@@ -2,6 +2,7 @@
 cli11/1.9.1
 fmt/7.1.2
 protobuf/3.15.5
+rapidjson/1.1.0
 
 [generators]
 cmake
