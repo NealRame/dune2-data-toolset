@@ -8,10 +8,6 @@ include(Conan)
 include(Utils)
 
 conan_env(VERSION 1.34.1)
-conan_add_remote(
-  NAME bincrafters
-  URL "https://api.bintray.com/conan/bincrafters/public-conan"
-)
 conan_setup(
   CONANFILE ${CMAKE_SOURCE_DIR}/conanfile.txt
   CMAKE_TARGETS
