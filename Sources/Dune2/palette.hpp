@@ -13,7 +13,6 @@ public:
         Channel red{0};
         Channel green{0};
         Channel blue{0};
-        Channel alpha{0};
     };
 
 public:
