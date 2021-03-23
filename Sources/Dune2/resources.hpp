@@ -4,6 +4,8 @@
 #include <Dune2/tileset.hpp>
 #include <Dune2/iconset.hpp>
 
+#include <rapidjson/document.h>
+
 #include <filesystem>
 #include <memory>
 
@@ -64,7 +66,7 @@ public:
     void serialize(const std::filesystem::path &) const;
 
 public:
-    void json_export(const std::filesystem::path &) const;
+    rapidjson::Document json_export() const;
 
 private:
     struct impl;

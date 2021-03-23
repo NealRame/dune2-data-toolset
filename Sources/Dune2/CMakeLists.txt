@@ -66,6 +66,7 @@ if(ADDRESS_SANITIZER)
 endif()
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
+    CONAN_PKG::cppcodec
     CONAN_PKG::fmt
     CONAN_PKG::protobuf
     CONAN_PKG::rapidjson
