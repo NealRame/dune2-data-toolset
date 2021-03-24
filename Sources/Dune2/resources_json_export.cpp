@@ -43,14 +43,20 @@ Value export_tile(
     value.AddMember("w", Value((unsigned int)tile.getWidth()), allocator);
     value.AddMember("h", Value((unsigned int)tile.getHeight()), allocator);
 
-    Value data;
-    data.SetString(base64::encode(tile.getData()).c_str(), allocator);
-    value.AddMember("data", data, allocator);
+    const auto data = base64::encode(tile.getData());
+    value.AddMember(
+        "data",
+        Value().SetString(data.c_str(), allocator),
+        allocator
+    );
 
     if (tile.hasRemapTable()) {
-        Value remap;
-        remap.SetString(base64::encode(tile.getRemapTableData()).c_str(), allocator);
-        value.AddMember("remap", remap, allocator);
+        const auto remap = base64::encode(tile.getRemapTableData());
+        value.AddMember(
+            "remap",
+            Value().SetString(remap.c_str(), allocator),
+            allocator
+        );
     }
 
     return value;
@@ -60,11 +66,11 @@ Value export_tileset(
     MemoryPoolAllocator<> &allocator,
     const Tileset &tileset
 ) {
-    Value value(rapidjson::kArrayType);
+    Value tiles(rapidjson::kArrayType);
     for (const auto &tile: tileset) {
-        value.PushBack(export_tile(allocator, tile), allocator);
+        tiles.PushBack(export_tile(allocator, tile), allocator);
     }
-    return value;
+    return tiles;
 }
 
 rapidjson::Document
@@ -76,19 +82,23 @@ Resource::json_export() const {
 
     // export palette.json
     Value palettes(rapidjson::kObjectType);
-    for (const auto &name: getPaletteList()) {
-        Value key;
-        key.SetString(name.c_str(), allocator);
-        palettes.AddMember(key, export_palette(allocator, getPalette(name)), allocator);
+    for (auto &&name: getPaletteList()) {
+        palettes.AddMember(
+            Value().SetString(name.c_str(), allocator),
+            export_palette(allocator, getPalette(name)),
+            allocator
+        );
     }
     d.AddMember("palettes", palettes, allocator);
 
     // export tilesets
     Value tilesets(rapidjson::kObjectType);
-    for (const auto &name: getTilesetList()) {
-        Value key;
-        key.SetString(name.c_str(), allocator);
-        tilesets.AddMember(key, export_tileset(allocator, getTileset(name)), allocator);
+    for (auto &&name: getTilesetList()) {
+        tilesets.AddMember(
+            Value().SetString(name.c_str(), allocator),
+            export_tileset(allocator, getTileset(name)),
+            allocator
+        );
     }
     d.AddMember("tilesets", tilesets, allocator);
 
