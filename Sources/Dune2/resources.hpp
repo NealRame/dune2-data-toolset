@@ -55,10 +55,11 @@ public:
     void importIconset(const std::string &name, const std::filesystem::path &);
 
     std::vector<std::string> getSoundsetList() const;
-    std::vector<std::string> getSoundList(const std::string &name) const;
-    bool hasSoundset(const std::string &name) const;
-    void createSoundset(const std::string &name);
-    void removeSoundset(const std::string &name);
+    std::vector<std::string> getSoundList(const std::string &soundset) const;
+    std::vector<std::pair<std::string, std::string>> getAllSounds(const std::string &soundset) const;
+    bool hasSoundset(const std::string &soundset) const;
+    void createSoundset(const std::string &soundset);
+    void removeSoundset(const std::string &soundset);
     void addSound(const std::string &soundset, const std::filesystem::path &filepath);
 
 public:

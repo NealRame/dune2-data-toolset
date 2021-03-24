@@ -195,6 +195,19 @@ Resource::getSoundList(const std::string &name) const {
     return sounds;
 }
 
+std::vector<std::pair<std::string, std::string>>
+Resource::getAllSounds(const std::string &soundset_name) const {
+    if (!hasSoundset(soundset_name)) {
+        throw ResourceNotFound(soundset_name);
+    }
+    const auto &soundset = d->rc.soundsets().at(soundset_name);
+    std::vector<std::pair<std::string, std::string>> sounds;
+    for (auto i = 0; i < soundset.sounds_size(); ++i) {
+        const auto sound = soundset.sounds(i);
+        sounds.emplace_back(sound.name(), sound.data());
+    }
+    return sounds;
+}
 
 Iconset
 Resource::getIconset(const std::string &name) const {

@@ -73,6 +73,27 @@ Value export_tileset(
     return tiles;
 }
 
+Value export_soundset(
+    MemoryPoolAllocator<> &allocator,
+    const std::vector<std::pair<std::string, std::string>> &sounds
+) {
+    using base64 = cppcodec::base64_rfc4648;
+    constexpr auto Name = 0u;
+    constexpr auto Data = 1u;
+
+    Value soundmap(rapidjson::kObjectType);
+    for (auto &&sound: sounds) {
+        const auto name = std::get<Name>(sound);
+        const auto data = base64::encode(std::get<Data>(sound));
+        soundmap.AddMember(
+            Value().SetString(name.c_str(), allocator),
+            Value().SetString(data.c_str(), allocator),
+            allocator
+        );
+    }
+    return soundmap;
+}
+
 rapidjson::Document
 Resource::json_export() const {
     rapidjson::Document d;
@@ -101,6 +122,17 @@ Resource::json_export() const {
         );
     }
     d.AddMember("tilesets", tilesets, allocator);
+
+    // export soundsets
+    Value soundsets(rapidjson::kObjectType);
+    for (auto &&soundset: getSoundsetList()) {
+        soundsets.AddMember(
+            Value().SetString(soundset.c_str(), allocator),
+            export_soundset(allocator, getAllSounds(soundset)),
+            allocator
+        );
+    }
+    d.AddMember("soundsets", soundsets, allocator);
 
     return d;
 }
