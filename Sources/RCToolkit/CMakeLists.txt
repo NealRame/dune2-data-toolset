@@ -6,6 +6,7 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
   app.cpp
   app.hpp
   main.cpp
+  commands/export.cpp
   commands/palette.cpp
   commands/soundset.cpp
   commands/iconset.cpp
@@ -23,6 +24,7 @@ target_link_libraries(${PROJECT_NAME}
     Dune2
     CONAN_PKG::cli11
     CONAN_PKG::fmt
+    CONAN_PKG::rapidjson
 )
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
