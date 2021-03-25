@@ -4,7 +4,6 @@ set(DUNE2_RC_PROTO "resources.proto")
 set(DUNE2_RC_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(DUNE2_RC "dune2.rc")
-set(DUNE2_RC_PB_JS "resources_pb.js")
 
 add_subdirectory(PAKExtract)
 add_subdirectory(Dune2)
@@ -22,7 +21,6 @@ add_custom_target(${PROJECT_NAME}
   ALL
   BYPRODUCTS
     ${DUNE2_RC}
-    ${DUNE2_RC_PB_JS}
   DEPENDS
     ${DUNE2_ATREIDES_MP3_FILES}
     ${DUNE2_HARKONNEN_MP3_FILES}
@@ -240,28 +238,31 @@ add_custom_command(
         --name Terrain ${DUNE2_TERRAIN_FILES}
 )
 
-# Javascript RC lib
+# Export data as JSON
 add_custom_command(
   TARGET ${PROJECT_NAME}
   POST_BUILD
   DEPENDS
-    ${DUNE2_RC_PROTO}
-  COMMENT "Generating javascript RC library"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}"
+    RCToolkit
+  COMMENT
+    "Export Dune2 data as JSON files"
   COMMAND
-    "${PROTOC_BIN}"
-        --proto_path=${DUNE2_RC_PROTO_DIR}
-        --js_out=import_style=commonjs,binary:"${CMAKE_CURRENT_BINARY_DIR}"
-        ${DUNE2_RC_PROTO}
-  USES_TERMINAL
+    $<TARGET_FILE:RCToolkit>
+      --rc-file ${DUNE2_RC}
+      export
 )
 
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/${DUNE2_RC}
-  DESTINATION public/assets
-)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/${DUNE2_RC_PB_JS}
-  DESTINATION src/core
-  RENAME dune2-rc.js
-)
+foreach(DATA_JSON palettes soundsets tilesets)
+  add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMENT
+      "Deflate ${DATA_JSON}.json"
+    COMMAND
+      gzip "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json"
+  )
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json.gz"
+    DESTINATION public/assets
+  )
+endforeach()
