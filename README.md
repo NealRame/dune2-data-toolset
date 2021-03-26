@@ -1,44 +1,28 @@
 Dune II data toolset
 ====================
 
-Provides command line tools to manipulate data from game __Dune II__.
+This project aims to extract data from the __Dune II__ game and convert it into
+a format usable by the project [Dune2 Online](https://github.com/NealRame/dune2-online).
 
-Build
------
+
+Configure options
+-----------------
+
+- `CMAKE_INSTALL_PREFIX` - `*.json.gz` files will be installed at `${CMAKE_INSTALL_PREFIX}/public/assets`
+- `DUNE2_DATA_ARCHIVE` - the path to orginal Dune 2 game archive
+
+Generate data
+-------------
 
 ```shell
 > cd dune2-data-toolset
 > mkdir Build
 > cd Build
-> cmake -DCMAKE_INSTALL_PREFIX="/path/where/to/install/binary" ..
+> cmake \
+    -G"Unix Makefiles" \
+    -DCMAKE_INSTALL_PREFIX="/path/where/to/install/binary" \
+    -DDUNE2_DATA_ARCHIVE="/path/to/dune2/archive.zip" \
+    ..
 > make
 > make install
 ```
-
-PAK extractor
--------------
-
-Extract data from a _.PAK_ file.
-
-### Synopsis
-```
-Usage: pak-extractor [OPTIONS] input-pak-file
-```
-
-### Options
-
-* `-h`, `--help`
-
-  Display help message and exit.
-
-* `-l`, `--list`
-
-  List file in the PAK.
-
-* `-v`, `--verbose`
-
-  Enable verbosity.
-
-* `-d arg`, `--output-dir=arg`
-
-  Set output directory.
