@@ -4,12 +4,12 @@
 
 #include <fmt/format.h>
 
+
 namespace {
 
 CLI::App_p
 create_import_command(AppState &app_state) {
     struct CmdState {
-        bool force{false};
         std::optional<std::string> name;
         std::vector<fs::path> sources;
     };
@@ -50,6 +50,7 @@ create_import_command(AppState &app_state) {
 CLI::App_p
 create_export_command(AppState &app_state) {
     struct CmdState {
+        fs::path outputDirectory{fs::current_path()};
         std::string paletteNane;
         std::string tilesetName;
     };
@@ -59,6 +60,13 @@ create_export_command(AppState &app_state) {
 
     cmd->name("export");
     cmd->description("Export tileset to bmp files");
+    cmd->add_option_function<fs::path>(
+        "-d,--output-directory",
+        [cmd_state](const fs::path &output_directory) {
+            cmd_state->outputDirectory = output_directory;
+        },
+        "Specify the output directory"
+    );
     cmd->add_option_function<std::string>(
         "TILESET_NAME",
         [cmd_state](const std::string &tileset_name) {
@@ -72,16 +80,22 @@ create_export_command(AppState &app_state) {
         }
     )->required();
     cmd->callback([cmd, cmd_state, &app_state]{
+        using fmt::format;
+        const auto output_directory = cmd_state->outputDirectory;
         const auto rc = app_state.resource();
         const auto palette = rc->getPalette(cmd_state->paletteNane);
         const auto tileset = rc->getTileset(cmd_state->tilesetName);
-
-        int i = 0;
-        for (auto &&tile: tileset) {
-            nr::dune2::BMP bmp(tile.getWidth(), tile.getHeight());
-            bmp.drawSurface(0, 0, tile, palette);
-            bmp.store(fmt::format("{}#{}.bmp", tileset.getName(), ++i));
-        }
+        const auto tileset_name = tileset.getName();
+        std::for_each(
+            tileset.begin(),
+            tileset.end(),
+            [&, i = 0u](const auto &tile) mutable {
+                const auto filename = format("{}#{}.bmp", tileset_name, ++i);
+                nr::dune2::BMP bmp(tile.getWidth(), tile.getHeight());
+                bmp.drawSurface(0, 0, tile, palette);
+                bmp.store(output_directory/tileset_name);
+            }
+        );
     });
 
     return cmd;
