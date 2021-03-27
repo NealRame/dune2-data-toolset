@@ -3,6 +3,7 @@
 #include <Dune2/palette.hpp>
 #include <Dune2/surface.hpp>
 
+#include <filesystem>
 #include <cstdint>
 #include <vector>
 
@@ -22,7 +23,7 @@ public:
     void drawSurface(size_t x, size_t y, const Surface &, const Palette &);
 
 public:
-    void store(const std::string &filepath) const;
+    void store(const std::filesystem::path &) const;
 
 private:
     size_t width_;

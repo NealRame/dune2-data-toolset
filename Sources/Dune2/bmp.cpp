@@ -67,7 +67,7 @@ BMP::drawSurface(
 }
 
 void
-BMP::store(const std::string &filepath) const {
+BMP::store(const std::filesystem::path &filepath) const {
     std::fstream output(filepath, std::ofstream::binary|std::ofstream::out);
 
     // Bitmap file header
