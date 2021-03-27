@@ -259,7 +259,7 @@ foreach(DATA_JSON palettes soundsets tilesets)
     COMMENT
       "Deflate ${DATA_JSON}.json"
     COMMAND
-      gzip "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json"
+      gzip --force "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json"
   )
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json.gz"
