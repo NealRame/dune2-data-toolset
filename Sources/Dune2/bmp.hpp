@@ -14,7 +14,7 @@ public:
     BMP(size_t width, size_t height);
 
 public:
-    size_t width() const  { return width_; }
+    size_t width() const { return width_; }
     size_t height() const { return height_; }
 
 public:

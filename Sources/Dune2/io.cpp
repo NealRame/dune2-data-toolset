@@ -30,16 +30,13 @@ readString(std::istream &in) {
     return name;
 }
 
-
 std::string
 readString(std::istream &in, size_t size) {
     std::string s(size, '\0');
     in.read(std::data(s), size);
     return s;
 }
-
 } // namespace nr::dune2::io
-
 
 std::ostream &
 operator<<(
