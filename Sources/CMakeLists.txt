@@ -182,12 +182,12 @@ add_custom_command(
     RCToolkit
     ${DUNE2_GAME_FX_MP3_FILES}
   COMMENT
-    "Importing AudioFX soundset"
+    "Importing FX soundset"
   COMMAND
     $<TARGET_FILE:RCToolkit>
       --rc-file ${DUNE2_RC}
       soundset import
-        --name AudioFX FX
+        --name FX FX
 )
 
 # palette
