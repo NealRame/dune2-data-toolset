@@ -35,24 +35,13 @@ Resource::~Resource() {
 }
 
 bool
-Resource::hasPalette(const std::string &name) const {
-    return d->rc.palettes().contains(name);
+Resource::hasPalette() const {
+    return d->rc.has_palette();
 }
 
 void
-Resource::removePalette(const std::string &name) {
-    d->rc.mutable_palettes()->erase(name);
-}
-
-void
-Resource::importPalette(
-    const std::string &name,
-    const std::filesystem::path &filepath) {
+Resource::importPalette(const std::filesystem::path &filepath) {
     constexpr auto scale = static_cast<float>(Palette::Color::ChannelMax);
-
-    if (hasPalette(name)) {
-        throw PaletteAlreadyExistError();
-    }
 
     nr::dune2::rc::Data::Palette pb_palette;
     nr::dune2::Palette palette;
@@ -68,17 +57,17 @@ Resource::importPalette(
         color_pb->set_blue(color.blue/scale);
     }
 
-    (*d->rc.mutable_palettes())[name] = pb_palette;
+    *d->rc.mutable_palette() = pb_palette;
 }
 
 Palette
-Resource::getPalette(const std::string &name) const {
-    if (!d->rc.palettes().contains(name)) {
-        throw ResourceNotFound(name);
+Resource::getPalette() const {
+    if (!hasPalette()) {
+        throw PaletteNotFound();
     }
 
     constexpr auto scale = Palette::Color::ChannelMax;
-    const auto pb_palette = d->rc.palettes().at(name);
+    const auto pb_palette = d->rc.palette();
     Palette palette;
 
     for (auto i = 0; i < pb_palette.colors_size(); ++i) {
@@ -91,15 +80,6 @@ Resource::getPalette(const std::string &name) const {
     }
 
     return palette;
-}
-
-std::vector<std::string>
-Resource::getPaletteList() const {
-    std::vector<std::string> palettes;
-    for (auto &&item: d->rc.palettes()) {
-        palettes.push_back(item.first);
-    }
-    return palettes;
 }
 
 bool

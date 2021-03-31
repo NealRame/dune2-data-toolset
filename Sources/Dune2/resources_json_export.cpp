@@ -101,16 +101,11 @@ Resource::json_export() const {
 
     d.SetObject();
 
-    // export palette.json
-    Value palettes(rapidjson::kObjectType);
-    for (auto &&name: getPaletteList()) {
-        palettes.AddMember(
-            Value().SetString(name.c_str(), allocator),
-            export_palette(allocator, getPalette(name)),
-            allocator
-        );
+    // export palette
+    if (hasPalette()) {
+        auto palette = getPalette();
+        d.AddMember("palette", export_palette(allocator, palette), allocator);
     }
-    d.AddMember("palettes", palettes, allocator);
 
     // export tilesets
     Value tilesets(rapidjson::kObjectType);

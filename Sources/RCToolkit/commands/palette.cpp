@@ -26,13 +26,6 @@ create_import_command(AppState &app_state) {
         },
         "Force overwrite if a palette with same name already exist in resources"
     );
-    cmd->add_option_function<std::string>(
-        "-n,--name",
-        [cmd_state](const std::string &name) {
-            cmd_state->name = name;
-        },
-        "Specify palette name"
-    );
     cmd->add_option_function<fs::path>(
         "PAL_FILE_PATH",
         [cmd_state](const fs::path &filepath) {
@@ -46,17 +39,14 @@ create_import_command(AppState &app_state) {
             ? cmd_state->dune2InputFilepath.stem().string()
             : cmd_state->name;
 
-        if (rc->hasPalette(name)) {
-            if (!cmd_state->force) {
-                throw CLI::Error(
-                    "PaletteOverwrite",
-                    fmt::format("palette '{}' already exist!", name)
-                );
-            }
-            rc->removePalette(name);
+        if (rc->hasPalette() && !cmd_state->force) {
+            throw CLI::Error(
+                "PaletteOverwrite",
+                fmt::format("palette already exist!")
+            );
         }
 
-        rc->importPalette(name, cmd_state->dune2InputFilepath);
+        rc->importPalette(cmd_state->dune2InputFilepath);
     });
     return cmd;
 }
@@ -72,7 +62,7 @@ create_export_command(AppState &app_state) {
         "PALETTE_NAME",
         [&](const std::string &name) {
             const auto rc = app_state.resource();
-            const auto palette = rc->getPalette(name);
+            const auto palette = rc->getPalette();
 
             nr::dune2::BMP bmp(256, 256);
             for (auto i = 0; i < 256; ++i) {
@@ -88,42 +78,6 @@ create_export_command(AppState &app_state) {
     return cmd;
 }
 
-CLI::App_p
-create_remove_command(AppState &app_state) {
-    auto cmd = std::make_shared<App>();
-
-    cmd->name("remove");
-    cmd->description("Remove palette");
-    cmd->add_option_function<std::string>(
-        "PALETTE_NAME",
-        [&](const std::string &name) {
-            auto rc = app_state.resource();
-            rc->removePalette(name);
-        }
-    );
-
-    return cmd;
-}
-
-CLI::App_p
-create_list_command(AppState &app_state) {
-    auto cmd = std::make_shared<App>();
-
-    cmd->name("list");
-    cmd->description("List palettes");
-    cmd->callback([&] {
-        const auto rc = app_state.resource();
-        const auto palettes = rc->getPaletteList();
-        std:copy(
-            palettes.begin(),
-            palettes.end(),
-            std::ostream_iterator<std::string>(std::cout, "\n")
-        );
-    });
-
-    return cmd;
-}
-
 } // namespace
 
 CLI::App_p
@@ -135,8 +89,6 @@ createPaletteCommands(AppState &app_state) {
     cmd->require_subcommand(1);
     cmd->add_subcommand(create_export_command(app_state));
     cmd->add_subcommand(create_import_command(app_state));
-    cmd->add_subcommand(create_list_command(app_state));
-    cmd->add_subcommand(create_remove_command(app_state));
 
     return cmd;
 }

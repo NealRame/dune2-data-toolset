@@ -13,7 +13,8 @@ namespace nr::dune2 {
 
 class Resource {
 public:
-    struct PaletteAlreadyExistError: public std::exception {};
+    struct PaletteNotFound: public std::exception {};
+
     struct ResourceNotFound: public std::exception {
         const std::string name;
 
@@ -34,11 +35,10 @@ public:
     struct deserialization_failure : public std::exception { };
 
 public:
-    Palette getPalette(const std::string &) const;
-    std::vector<std::string> getPaletteList() const;
-    bool hasPalette(const std::string &) const;
-    void removePalette(const std::string &);
-    void importPalette(const std::string &, const std::filesystem::path &);
+    bool hasPalette() const;
+    Palette getPalette() const;
+    void importPalette(const std::filesystem::path &);
+    void removePalette();
 
     Tileset getTileset(const std::string &name) const;
     std::vector<std::string> getTilesetList() const;

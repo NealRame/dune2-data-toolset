@@ -73,17 +73,11 @@ create_export_command(AppState &app_state) {
             cmd_state->tilesetName = tileset_name;
         }
     )->required();
-    cmd->add_option_function<std::string>(
-        "PALETTE_NAME",
-        [cmd_state](const std::string &palette_name) {
-            cmd_state->paletteNane = palette_name;
-        }
-    )->required();
     cmd->callback([cmd, cmd_state, &app_state]{
         using fmt::format;
         const auto output_directory = cmd_state->outputDirectory;
         const auto rc = app_state.resource();
-        const auto palette = rc->getPalette(cmd_state->paletteNane);
+        const auto palette = rc->getPalette();
         const auto tileset = rc->getTileset(cmd_state->tilesetName);
         const auto tileset_name = tileset.getName();
         std::for_each(

@@ -64,15 +64,9 @@ create_export_command(AppState &app_state) {
             cmd_state->iconsetName = iconset_name;
         }
     )->required();
-    cmd->add_option_function<std::string>(
-        "PALETTE_NAME",
-        [cmd_state](const std::string &palette_name) {
-            cmd_state->paletteNane = palette_name;
-        }
-    )->required();
     cmd->callback([cmd, cmd_state, &app_state]{
         const auto rc = app_state.resource();
-        const auto palette = rc->getPalette(cmd_state->paletteNane);
+        const auto palette = rc->getPalette();
         const auto tileset = rc->getTileset(cmd_state->iconsetName);
         const auto iconset = rc->getIconset(cmd_state->iconsetName);
 

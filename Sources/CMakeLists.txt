@@ -1,8 +1,5 @@
 find_program(PROTOC_BIN protoc REQUIRED)
 
-set(DUNE2_RC_PROTO "resources.proto")
-set(DUNE2_RC_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
 set(DUNE2_RC "dune2.rc")
 
 add_subdirectory(PAKExtract)
@@ -190,7 +187,7 @@ add_custom_command(
         --name FX FX
 )
 
-# palette
+# Palette
 add_custom_command(
   TARGET ${PROJECT_NAME}
   POST_BUILD
@@ -202,8 +199,7 @@ add_custom_command(
   COMMAND
     $<TARGET_FILE:RCToolkit>
       --rc-file ${DUNE2_RC}
-      palette import
-        --name Bene ${DUNE2_PAL_FILE}
+      palette import ${DUNE2_PAL_FILE}
 )
 
 # Units tileset
@@ -252,7 +248,7 @@ add_custom_command(
       export
 )
 
-foreach(DATA_JSON palettes soundsets tilesets)
+foreach(DATA_JSON palette soundsets tilesets)
   add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD

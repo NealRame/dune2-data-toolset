@@ -1,5 +1,7 @@
 project(Dune2)
 
+set(DUNE2_RC_PB_PROTO "resources.proto")
+
 set(DUNE2_RC_PB_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 list(APPEND DUNE2_RC_PB_SOURCES
   "${DUNE2_RC_PB_DIR}/resources.pb.cc"
@@ -10,14 +12,14 @@ add_custom_command(
   OUTPUT
     ${DUNE2_RC_PB_SOURCES}
   DEPENDS
-    ${DUNE2_RC_PROTO_DIR}/${DUNE2_RC_PROTO}
-  COMMENT "Running cpp protocol buffer compiler on ${DUNE2_RC_PROTO}"
+    ${DUNE2_RC_PB_PROTO}
+  COMMENT "Running cpp protocol buffer compiler on ${DUNE2_RC_PB_PROTO}"
   COMMAND ${CMAKE_COMMAND} -E make_directory "${DUNE2_RC_PB_DIR}"
   COMMAND
     "${PROTOC_BIN}"
-        --proto_path="${DUNE2_RC_PROTO_DIR}"
+        --proto_path="${CMAKE_CURRENT_SOURCE_DIR}"
         --cpp_out="${DUNE2_RC_PB_DIR}"
-      "${DUNE2_RC_PROTO}"
+      "${DUNE2_RC_PB_PROTO}"
   USES_TERMINAL
 )
 
