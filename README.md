@@ -8,7 +8,7 @@ a format usable by the project [Dune2 Online](https://github.com/NealRame/dune2-
 Configure options
 -----------------
 
-- `CMAKE_INSTALL_PREFIX` - `*.json.gz` files will be installed at `${CMAKE_INSTALL_PREFIX}/public/assets`
+- `CMAKE_INSTALL_PREFIX` - the install prefix, _*.json.gz_ files will be installed at `${CMAKE_INSTALL_PREFIX}/public/assets`
 - `DUNE2_DATA_ARCHIVE` - the path to orginal Dune 2 game archive
 
 Generate data
