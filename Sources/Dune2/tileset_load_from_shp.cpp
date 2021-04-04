@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 
+namespace fs = std::filesystem;
 namespace nr::dune2 {
 
 namespace {
@@ -172,7 +173,7 @@ read_shp_tile(std::istream &input, std::istream::pos_type pos) {
 } // namespace
 
 void
-Tileset::loadFromSHP(const std::string &shp_path) {
+Tileset::loadFromSHP(const fs::path &shp_path) {
     std::ifstream input;
 
     input.open(shp_path, std::ios::binary);

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 
+namespace fs = std::filesystem;
 namespace nr::dune2 {
 
 namespace {
@@ -117,7 +118,7 @@ read_rtbl_chunk(std::ifstream &input, const ICNInfo &info) {
 } // namespace
 
 void
-Tileset::loadFromICN(const std::string &icn_path) {
+Tileset::loadFromICN(const fs::path &icn_path) {
     using namespace std::literals;
     std::ifstream input;
 

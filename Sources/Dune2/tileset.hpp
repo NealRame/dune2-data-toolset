@@ -2,6 +2,7 @@
 
 #include <Dune2/surface.hpp>
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -80,14 +81,14 @@ public:
     /// ### method `nr::dune2::Tileset::loadFromICN`
     /// Load tiles from given `.icn` files.
     /// #### Parameters
-    /// * `const std::string &icn_path` - a path to `*.icn` file
-    void loadFromICN(const std::string &icn_path);
+    /// * `const std::filesystem::path &icn_path` - a path to `*.icn` file
+    void loadFromICN(const std::filesystem::path &icn_path);
 
     /// ### method `nr::dune2::Tileset::loadFromSHP`
     /// Load tiles from given `.shp` files.
     /// #### Parameters
-    /// * `const std::string &shp_path` - a path to `*.shp` file
-    void loadFromSHP(const std::string &shp_path);
+    /// * `const std::filesystem::path &shp_path` - a path to `*.shp` file
+    void loadFromSHP(const std::filesystem::path &shp_path);
 
 public:
     /// ### method `nr::dune2::Tileset.getTileInfo`
