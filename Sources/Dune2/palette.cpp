@@ -1,9 +1,11 @@
 #include "palette.hpp"
+#include "io.hpp"
 
 #include <Dune2/io.hpp>
 
 #include <fstream>
 
+namespace fs = std::filesystem;
 namespace nr::dune2 {
 
 Palette::Palette()
@@ -11,7 +13,7 @@ Palette::Palette()
 }
 
 void
-Palette::load(const std::string &filepath) {
+Palette::loadFromPAL(const fs::path &filepath) {
     std::ifstream input;
 
     input.exceptions(std::ifstream::failbit);

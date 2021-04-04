@@ -45,9 +45,8 @@ Resource::importPalette(const std::filesystem::path &filepath) {
 
     nr::dune2::rc::Data::Palette pb_palette;
     nr::dune2::Palette palette;
-
-    palette.load(filepath);
-
+    
+    palette.loadFromPAL(filepath);
     for (auto &&color: palette) {
         auto color_pb = pb_palette.add_colors();
 
@@ -56,7 +55,6 @@ Resource::importPalette(const std::filesystem::path &filepath) {
         color_pb->set_green(color.green/scale);
         color_pb->set_blue(color.blue/scale);
     }
-
     *d->rc.mutable_palette() = pb_palette;
 }
 

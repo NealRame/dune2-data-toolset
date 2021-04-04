@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <limits>
 #include <string>
 #include <vector>
@@ -19,7 +20,7 @@ public:
     Palette();
 
 public:
-    void load(const std::string &filepath);
+    void loadFromPAL(const std::filesystem::path &);
 
 public:
     size_t size() const
