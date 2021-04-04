@@ -50,7 +50,7 @@ Tileset::begin() const {
     return tiles_.begin();
 }
 
-Tileset::TileIterator 
+Tileset::TileIterator
 Tileset::end() const {
     return tiles_.end();
 }
