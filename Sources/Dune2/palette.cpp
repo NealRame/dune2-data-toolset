@@ -1,7 +1,7 @@
 #include "palette.hpp"
 #include "io.hpp"
 
-#include <Dune2/io.hpp>
+#include <rapidjson/document.h>
 
 #include <fstream>
 
@@ -34,5 +34,25 @@ Palette::loadFromPAL(const fs::path &filepath) {
         }
     );
 }
+
+void
+Palette::loadFromJSON(std::string_view json) {
+    rapidjson::Document doc;
+    doc.Parse(json.data());
+
+    std::transform(
+        doc.Begin(),
+        doc.End(),
+        colors_.begin(),
+        [](const auto &v) {
+            return Palette::Color{
+                static_cast<Palette::Color::Channel>(v[0].GetInt()),
+                static_cast<Palette::Color::Channel>(v[1].GetInt()),
+                static_cast<Palette::Color::Channel>(v[2].GetInt()),
+            };
+        }
+    );
+}
+
 
 } // namespace nr::dune2

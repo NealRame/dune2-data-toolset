@@ -21,6 +21,7 @@ public:
 
 public:
     void loadFromPAL(const std::filesystem::path &);
+    void loadFromJSON(std::string_view json);
 
 public:
     size_t size() const
