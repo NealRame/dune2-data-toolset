@@ -1,8 +1,6 @@
 #include "palette.hpp"
 #include "io.hpp"
 
-#include <rapidjson/document.h>
-
 #include <fstream>
 
 namespace fs = std::filesystem;
@@ -36,13 +34,10 @@ Palette::loadFromPAL(const fs::path &filepath) {
 }
 
 void
-Palette::loadFromJSON(std::string_view json) {
-    rapidjson::Document doc;
-    doc.Parse(json.data());
-
+Palette::loadFromJSON(const rapidjson::Value &json) {
     std::transform(
-        doc.Begin(),
-        doc.End(),
+        json.Begin(),
+        json.End(),
         colors_.begin(),
         [](const auto &v) {
             return Palette::Color{

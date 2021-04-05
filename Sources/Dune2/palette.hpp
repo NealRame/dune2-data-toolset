@@ -1,8 +1,9 @@
 #pragma once
 
+#include <rapidjson/document.h>
+
 #include <filesystem>
 #include <limits>
-#include <string>
 #include <vector>
 
 namespace nr::dune2 {
@@ -21,7 +22,7 @@ public:
 
 public:
     void loadFromPAL(const std::filesystem::path &);
-    void loadFromJSON(std::string_view json);
+    void loadFromJSON(const rapidjson::Value &);
 
 public:
     size_t size() const
