@@ -16,46 +16,6 @@ using rapidjson::Document;
 using rapidjson::Value;
 using rapidjson::MemoryPoolAllocator;
 
-Value export_tile(
-    MemoryPoolAllocator<> &allocator,
-    const Tileset::Tile &tile
-) {
-    using base64 = cppcodec::base64_rfc4648;
-    Value value(rapidjson::kObjectType);
-
-    value.AddMember("w", Value((unsigned int)tile.getWidth()), allocator);
-    value.AddMember("h", Value((unsigned int)tile.getHeight()), allocator);
-
-    const auto data = base64::encode(tile.getData());
-    value.AddMember(
-        "data",
-        Value().SetString(data.c_str(), allocator),
-        allocator
-    );
-
-    if (tile.hasRemapTable()) {
-        const auto remap = base64::encode(tile.getRemapTableData());
-        value.AddMember(
-            "remap",
-            Value().SetString(remap.c_str(), allocator),
-            allocator
-        );
-    }
-
-    return value;
-}
-
-Value export_tileset(
-    MemoryPoolAllocator<> &allocator,
-    const Tileset &tileset
-) {
-    Value tiles(rapidjson::kArrayType);
-    for (const auto &tile: tileset) {
-        tiles.PushBack(export_tile(allocator, tile), allocator);
-    }
-    return tiles;
-}
-
 Value export_soundset(
     MemoryPoolAllocator<> &allocator,
     const std::vector<std::pair<std::string, std::string>> &sounds
@@ -95,7 +55,7 @@ Resource::json_export() const {
     for (auto &&name: getTilesetList()) {
         tilesets.AddMember(
             Value().SetString(name.c_str(), allocator),
-            export_tileset(allocator, getTileset(name)),
+            getTileset(name).toJSON(d),
             allocator
         );
     }
