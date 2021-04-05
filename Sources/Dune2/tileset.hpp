@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <rapidjson/document.h>
+
 namespace nr::dune2 {
 class Tileset {
 public:
@@ -89,6 +91,20 @@ public:
     /// #### Parameters
     /// * `const std::filesystem::path &shp_path` - a path to `*.shp` file
     void loadFromSHP(const std::filesystem::path &shp_path);
+
+    /// ### method `nr::dune2::Tileset::loadFromJSON`
+    /// Load tiles from the given _JSON_ value.
+    /// #### Parameters
+    /// * `const rapidjson::Value &` - json data
+    void loadFromJSON(const rapidjson::Value &);
+
+
+public:
+    /// ### method `nr::dune2::Tileset::toJSON`
+    /// Transform this tileset to _JSON_ value
+    /// #### Parameters
+    /// * `rapidjson::Document &`
+    rapidjson::Value toJSON(rapidjson::Document &);
 
 public:
     /// ### method `nr::dune2::Tileset.getTileInfo`
