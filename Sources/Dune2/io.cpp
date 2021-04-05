@@ -1,5 +1,7 @@
 #include "io.hpp"
 
+#include <sstream>
+
 namespace nr::dune2::io {
 
 IPosOffsetGuard::IPosOffsetGuard(std::istream &input)
@@ -22,12 +24,13 @@ OPosOffsetGuard::~OPosOffsetGuard() {
 
 std::string
 readString(std::istream &in) {
-    char c;
-    std::string name;
-    while (in && (c = in.get()) != '\0') {
-        name.push_back(c);
-    }
-    return name;
+    std::ostringstream oss;
+    std::copy(
+        std::istreambuf_iterator<char>(in),
+        std::istreambuf_iterator<char>(),
+        std::ostreambuf_iterator<char>(oss)
+    );
+    return oss.str();
 }
 
 std::string
