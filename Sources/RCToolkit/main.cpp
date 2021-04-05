@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 CLI::App_p createExportCommand(AppState &);
+CLI::App_p createExtractCommands(AppState &);
 CLI::App_p createPaletteCommands(AppState &);
 CLI::App_p createTilesetCommands(AppState &);
 CLI::App_p createIconsetCommands(AppState &);
@@ -26,6 +27,7 @@ main(int argc, char const *argv[]) {
 
     app.require_subcommand(1);
     app.add_subcommand(createExportCommand(app_state));
+    app.add_subcommand(createExtractCommands(app_state));
     app.add_subcommand(createPaletteCommands(app_state));
     app.add_subcommand(createTilesetCommands(app_state));
     app.add_subcommand(createIconsetCommands(app_state));

@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
   app.hpp
   main.cpp
   commands/export.cpp
+  commands/extract.cpp
   commands/palette.cpp
   commands/soundset.cpp
   commands/iconset.cpp
