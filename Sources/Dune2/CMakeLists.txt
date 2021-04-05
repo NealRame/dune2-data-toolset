@@ -39,6 +39,7 @@ add_library(${PROJECT_NAME} EXCLUDE_FROM_ALL
   surface.hpp
   tileset.cpp
   tileset_load_from_icn.cpp
+  tileset_load_from_json.cpp
   tileset_to_json.cpp
   tileset_load_from_shp.cpp
   tileset.hpp
