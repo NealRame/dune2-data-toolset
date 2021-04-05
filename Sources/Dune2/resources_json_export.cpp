@@ -16,23 +16,6 @@ using rapidjson::Document;
 using rapidjson::Value;
 using rapidjson::MemoryPoolAllocator;
 
-Value export_palette(
-    MemoryPoolAllocator<> &allocator,
-    const Palette &palette
-) {
-    Value value(rapidjson::kArrayType);
-    for (auto &&color: palette) {
-        value.PushBack(
-            Value(rapidjson::kArrayType)
-                .PushBack(Value(color.red), allocator)
-                .PushBack(Value(color.green), allocator)
-                .PushBack(Value(color.blue), allocator),
-            allocator
-        );
-    }
-    return value;
-}
-
 Value export_tile(
     MemoryPoolAllocator<> &allocator,
     const Tileset::Tile &tile
@@ -104,7 +87,7 @@ Resource::json_export() const {
     // export palette
     if (hasPalette()) {
         auto palette = getPalette();
-        d.AddMember("palette", export_palette(allocator, palette), allocator);
+        d.AddMember("palette", palette.toJSON(d), allocator);
     }
 
     // export tilesets
