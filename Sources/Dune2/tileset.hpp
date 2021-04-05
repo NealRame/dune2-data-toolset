@@ -107,9 +107,21 @@ public:
     rapidjson::Value toJSON(rapidjson::Document &);
 
 public:
-    /// ### method `nr::dune2::Tileset.getTileInfo`
+    /// ### method `nr::dune2::Tileset.getName`
+    /// #### Return
+    /// `const std::string &` - this `Tileset` name.
     const std::string &getName() const
     { return name_; }
+
+    /// ### method nr::dune2::Tileset.setName`
+    /// #### Parameters
+    /// * `const std::string &name` - set the name of the tileset
+    /// #### Return
+    /// `Tileset &` - this `Tileset`.
+    Tileset &setName(const std::string &name) {
+        name_ = name;
+        return *this;
+    }
 
     /// ### method `nr::dune2::Tileset.getTileCount`
     /// #### Return
