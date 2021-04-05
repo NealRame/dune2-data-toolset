@@ -25,6 +25,9 @@ public:
     void loadFromJSON(const rapidjson::Value &);
 
 public:
+    rapidjson::Value toJSON(rapidjson::Document &) const;
+
+public:
     size_t size() const
     { return colors_.size(); }
 

@@ -49,5 +49,23 @@ Palette::loadFromJSON(const rapidjson::Value &json) {
     );
 }
 
+rapidjson::Value
+Palette::toJSON(rapidjson::Document &doc) const {
+    using rapidjson::Value;
+
+    Value value(rapidjson::kArrayType);
+    auto &allocator = doc.GetAllocator();
+
+    for (auto &&color: colors_) {
+        value.PushBack(
+            Value(rapidjson::kArrayType)
+                .PushBack(Value(color.red), allocator)
+                .PushBack(Value(color.green), allocator)
+                .PushBack(Value(color.blue), allocator),
+            allocator
+        );
+    }
+    return value;
+}
 
 } // namespace nr::dune2
