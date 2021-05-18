@@ -234,6 +234,22 @@ add_custom_command(
         --name Terrain ${DUNE2_TERRAIN_FILES}
 )
 
+# Miscellaneous
+add_custom_command(
+  TARGET ${PROJECT_NAME}
+  POST_BUILD
+  DEPENDS
+    RCToolkit
+    ${DUNE2_MISC_FILES}
+  COMMENT
+    "Importing Misc tiles"
+  COMMAND
+    $<TARGET_FILE:RCToolkit>
+      --rc-file ${DUNE2_RC}
+      tileset import
+        --name Misc ${DUNE2_MISC_FILES}
+)
+
 # Export data as JSON
 add_custom_command(
   TARGET ${PROJECT_NAME}
