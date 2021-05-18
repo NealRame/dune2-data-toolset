@@ -80,6 +80,7 @@ readData(std::istream &input, size_t count) {
     return buffer;
 }
 
+std::string readAll(std::istream &);
 std::string readString(std::istream &);
 std::string readString(std::istream &, size_t);
 

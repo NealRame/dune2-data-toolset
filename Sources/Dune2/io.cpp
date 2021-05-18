@@ -23,7 +23,7 @@ OPosOffsetGuard::~OPosOffsetGuard() {
 }
 
 std::string
-readString(std::istream &in) {
+readAll(std::istream &in) {
     std::ostringstream oss;
     std::copy(
         std::istreambuf_iterator<char>(in),
@@ -31,6 +31,13 @@ readString(std::istream &in) {
         std::ostreambuf_iterator<char>(oss)
     );
     return oss.str();
+}
+
+std::string
+readString(std::istream &in) {
+    std::string s;
+    std::getline(in, s, '\0');
+    return s;
 }
 
 std::string

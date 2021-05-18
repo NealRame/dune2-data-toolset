@@ -11,7 +11,7 @@ namespace {
 
 rapidjson::Document
 loadJSON(std::istream &in) {
-    const auto src = nr::dune2::io::readString(in);
+    const auto src = nr::dune2::io::readAll(in);
     rapidjson::Document doc;
     doc.Parse(src.c_str());
     return doc;
@@ -150,6 +150,21 @@ create_extract_tilesets_command(AppState &app_state) {
                 tileset.begin(),
                 tileset.end(),
                 [&, tile_index = 0u](const auto &tile) mutable {
+                    if (tileset.getName() == "Terrain" && tile_index == 19) {
+                        const auto &data = tile.getData();
+                        for (auto i = 0; i < data.size(); ++i) {
+                            if (i > 0 && i % 16 == 0) {
+                                std::cout << format("\n0x{:0>2x}, ", (unsigned char)data.at(i));
+                            } else {
+                                std::cout << format("0x{:0>2x}, ", (unsigned char)data.at(i));
+                            }
+                        }
+                        std::cout << std::endl;
+                        std::cout << std::endl;
+                    }
+                    tile_index += 1;
+
+
                     const auto file_name = format("{}.bmp", tile_index);
                     const auto file_path = cmd_state->outputDirectory/tileset.getName();
 
@@ -179,7 +194,6 @@ create_extract_tilesets_command(AppState &app_state) {
                         remap_bmp.store(file_path/remap_file_name);
                     }
 
-                    tile_index += 1;
                 }
             );
         }
