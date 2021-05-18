@@ -79,15 +79,15 @@ create_export_command(AppState &app_state) {
         const auto rc = app_state.resource();
         const auto palette = rc->getPalette();
         const auto tileset = rc->getTileset(cmd_state->tilesetName);
-        const auto tileset_name = tileset.getName();
         std::for_each(
             tileset.begin(),
             tileset.end(),
             [&, i = 0u](const auto &tile) mutable {
-                const auto filename = format("{}#{}.bmp", tileset_name, ++i);
+                const auto filename = format("{}#{}.bmp", cmd_state->tilesetName, ++i);
+                std::cout << output_directory/filename << std::endl;
                 nr::dune2::BMP bmp(tile.getWidth(), tile.getHeight());
                 bmp.drawSurface(0, 0, tile, palette);
-                bmp.store(output_directory/tileset_name);
+                bmp.store(output_directory/filename);
             }
         );
     });
