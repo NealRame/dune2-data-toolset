@@ -5,6 +5,7 @@
 #include <istream>
 #include <utility>
 
+namespace fs = std::filesystem;
 namespace {
 
 using PAKRawEntry = std::pair<size_t, std::string>;
@@ -38,7 +39,7 @@ namespace nr::dune2 {
 // PAK
 
 void
-PAK::load(const std::string &filepath) {
+PAK::load(const fs::path &filepath) {
     std::ifstream input;
 
     input.open(filepath, std::ios::binary);
@@ -60,7 +61,7 @@ PAK::load(const std::string &filepath) {
                 .offset   = raw_entry1.first,
                 .size     = raw_entry2.first - raw_entry1.first,
                 .name     = raw_entry1.second,
-                .filepath = std::make_shared<std::string>(filepath)
+                .filepath = filepath
             };
         }
     );
@@ -92,7 +93,7 @@ PAK::cend() const {
 std::string
 PAK::Entry::read() const {
     std::string buf(size, 0);
-    std::ifstream input(*filepath, std::ifstream::binary);
+    std::ifstream input(filepath, std::ifstream::binary);
     input.seekg(offset);
     input.read(buf.data(), buf.size());
     return buf;

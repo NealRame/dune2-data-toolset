@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -11,13 +12,13 @@ public:
         const size_t offset{0};
         const size_t size{0};
         const std::string name;
-        const std::shared_ptr<std::string> filepath;
+        const std::filesystem::path filepath;
 
         std::string read() const;
     };
 
 public:
-    void load(const std::string &filepath);
+    void load(const std::filesystem::path &);
 
 public:
     using const_iterator = std::vector<Entry>::const_iterator;
