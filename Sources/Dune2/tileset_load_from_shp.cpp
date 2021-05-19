@@ -121,7 +121,7 @@ shp_lcw_deflate(std::istream &input, size_t size, std::vector<uint8_t> &dst) {
 }
 
 Tileset::Tile
-read_shp_tile(std::istream &input, std::istream::pos_type pos) {
+shp_read_tile(std::istream &input, std::istream::pos_type pos) {
     input.seekg(pos);
 
     std::bitset<16> frame_flags(io::readLEInteger<2>(input));
@@ -187,7 +187,7 @@ Tileset::loadFromSHP(const fs::path &shp_path) {
         offsets.end(),
         std::back_inserter(tiles_),
         [&](const auto pos) {
-            return read_shp_tile(input, pos);
+            return shp_read_tile(input, pos);
         }
     );
 }
