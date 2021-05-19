@@ -6,6 +6,7 @@
 #include <functional>
 #include <istream>
 #include <string_view>
+#include <vector>
 
 namespace nr::dune2::io {
 
@@ -79,6 +80,8 @@ readData(std::istream &input, size_t count) {
 
     return buffer;
 }
+
+std::vector<uint8_t> readLCWData(std::istream &, size_t deflated_size, size_t inflated_size);
 
 std::string readAll(std::istream &);
 std::string readString(std::istream &);

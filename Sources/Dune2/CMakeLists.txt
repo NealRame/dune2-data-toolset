@@ -29,6 +29,7 @@ add_library(${PROJECT_NAME} EXCLUDE_FROM_ALL
   bswap.hpp
   io.cpp
   io.hpp
+  io_lcw.cpp
   pak.cpp
   pak.hpp
   palette.cpp
