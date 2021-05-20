@@ -14,6 +14,7 @@ add_library(${PROJECT_NAME} EXCLUDE_FROM_ALL
   surface.hpp
   image.cpp
   image.hpp
+  image_load_from_cps.cpp
   image_set.cpp
   image_set_load_from_icn.cpp
   image_set_load_from_json.cpp

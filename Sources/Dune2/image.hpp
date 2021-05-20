@@ -35,6 +35,13 @@ public:
     }
 
 public:
+    /// ### method `nr::dune2::Image::loadFromCPS`
+    /// Load image data from given `.cps` files.
+    /// #### Parameters
+    /// - `const std::filesystem::path &icn_path` - a path to `*.cps` file
+    void loadFromCPS(const std::filesystem::path &);
+
+public:
     /// ### method `nr::dune2::ImageSet::Image.getWidth`
     /// See [`nr::dune2::Surface.getWidth`](/docs/nr/dune2/surface#getWidth)
     /// for more details.
