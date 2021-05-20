@@ -22,10 +22,9 @@ using Writer = rapidjson::Writer<OStreamWrapper>;
 CLI::App_p
 create_create_command(AppState &app_state) {
     struct CmdState {
-        bool force{false};
         bool pretty{false};
         fs::path inputFilepath;
-        fs::path outputFilepath{"icons.json"};
+        std::optional<fs::path> outputFilepath;
     };
 
     auto cmd = std::make_shared<App>();
@@ -33,14 +32,6 @@ create_create_command(AppState &app_state) {
 
     cmd->name("create");
     cmd->description("Import Dune2 icon mapping to resources");
-
-    cmd->add_flag_function(
-        "-f,--force",
-        [cmd_state](auto count) {
-            cmd_state->force = (count != 0);
-        },
-        "Force overwrite if palette already exists"
-    );
 
     cmd->add_flag_function(
         "-p,--pretty",
@@ -68,20 +59,15 @@ create_create_command(AppState &app_state) {
 
     cmd->callback([cmd, cmd_state, &app_state] {
         nr::dune2::IconSet icn;
-
         icn.loadFromMAP(cmd_state->inputFilepath);
-
-        std::ofstream ofs(cmd_state->outputFilepath);
-        OStreamWrapper osw(ofs);
 
         const auto json = icn.toJSON();
 
-        if (cmd_state->pretty) {
-            PrettyWriter writer(osw);
-            json.Accept(writer);
+        if (cmd_state->outputFilepath) {
+            std::ofstream ofs(cmd_state->outputFilepath.value());
+            nr::flushJSON(json, cmd_state->pretty, ofs);
         } else {
-            Writer writer(osw);
-            json.Accept(writer);
+            nr::flushJSON(json, cmd_state->pretty, std::cout);
         }
     });
 

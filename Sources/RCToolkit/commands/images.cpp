@@ -22,10 +22,9 @@ using Writer = rapidjson::Writer<OStreamWrapper>;
 CLI::App_p
 create_create_command(AppState &app_state) {
     struct CmdState {
-        bool force{false};
         bool pretty{false};
         std::vector<fs::path> sources;
-        fs::path outputFilepath{"images.json"};
+        std::optional<fs::path> outputFilepath;
     };
 
     auto cmd = std::make_shared<App>();
@@ -35,19 +34,13 @@ create_create_command(AppState &app_state) {
     cmd->description("Create a Dune2 image lib from the given files");
 
     cmd->add_flag_function(
-        "-f,--force",
-        [cmd_state](auto count) {
-            cmd_state->force = (count != 0);
-        },
-        "Force overwrite if palette already exists"
-    );
-    cmd->add_flag_function(
         "-p,--pretty",
         [cmd_state](auto count) {
             cmd_state->pretty = (count != 0);
         },
         "Enable pretty output"
     );
+
     cmd->add_option_function<fs::path>(
         "-o,--output-file",
         [cmd_state](const fs::path &outputFilepath) {
@@ -55,6 +48,7 @@ create_create_command(AppState &app_state) {
         },
         "Specify the output file"
     );
+
     cmd->add_option_function<std::vector<fs::path>>(
         "SOURCES",
         [cmd_state](const std::vector<fs::path> &sources) {
@@ -69,16 +63,13 @@ create_create_command(AppState &app_state) {
             nr::load(tileset, source);
         }
 
-        std::ofstream ofs(cmd_state->outputFilepath);
-        OStreamWrapper osw(ofs);
         const auto json = tileset.toJSON();
 
-        if (cmd_state->pretty) {
-            PrettyWriter writer(osw);
-            json.Accept(writer);
+        if (cmd_state->outputFilepath) {
+            std::ofstream ofs(*cmd_state->outputFilepath);
+            nr::flushJSON(json, cmd_state->pretty, ofs);
         } else {
-            Writer writer(osw);
-            json.Accept(writer);
+            nr::flushJSON(json, cmd_state->pretty, std::cout);
         }
     });
     return cmd;
