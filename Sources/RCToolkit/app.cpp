@@ -50,6 +50,10 @@ load<dune2::ImageSet>(
         tileset.loadFromSHP(source);
     } else if (filepathMatch(source, ".json")) {
         tileset.loadFromJSON(source);
+    } else if (filepathMatch(source, ".cps")) {
+        dune2::Image image;
+        image.loadFromCPS(source);
+        tileset.push_back(std::move(image));
     } else {
         throw CLI::Error(
             "Unsupported file",

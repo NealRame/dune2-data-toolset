@@ -3,6 +3,7 @@
 #include <Dune2/io.hpp>
 #include <Dune2/palette.hpp>
 #include <Dune2/icon_set.hpp>
+#include <Dune2/image.hpp>
 #include <Dune2/image_set.hpp>
 
 #include <CLI/CLI.hpp>

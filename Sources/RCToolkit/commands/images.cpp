@@ -65,7 +65,6 @@ create_create_command(AppState &app_state) {
 
     cmd->callback([cmd, cmd_state, &app_state] {
         nr::dune2::ImageSet tileset;
-
         for (auto &&source: cmd_state->sources) {
             nr::load(tileset, source);
         }
@@ -88,9 +87,9 @@ create_create_command(AppState &app_state) {
 CLI::App_p
 create_extract_command(AppState &app_state) {
     struct CmdState {
-        fs::path outputDirectory{fs::current_path()};
         fs::path paletteFilepath;
-        fs::path inputFilepath;
+        std::vector<fs::path> sources;
+        fs::path outputDirectory{fs::current_path()};
     };
 
     auto cmd = std::make_shared<App>();
@@ -115,12 +114,12 @@ create_extract_command(AppState &app_state) {
         "Path to Dune2 .pal or .json file"
     )->required()->check(CLI::ExistingFile);
 
-    cmd->add_option_function<fs::path>(
-        "IMAGE_SET",
-        [cmd_state](const fs::path &inputFilepath) {
-            cmd_state->inputFilepath = inputFilepath;
+    cmd->add_option_function<std::vector<fs::path>>(
+        "SOURCES",
+        [cmd_state](const std::vector<fs::path> &sources) {
+            cmd_state->sources = sources;
         },
-        "Path to Dune2 .icn, .shp or .json files"
+        "Path to Dune2 .cps, .icn, .shp or .json files"
     )->required()->check(CLI::ExistingFile);
 
     cmd->callback([cmd, cmd_state, &app_state]{
@@ -130,12 +129,14 @@ create_extract_command(AppState &app_state) {
         nr::dune2::Palette palette;
         nr::load(palette, cmd_state->paletteFilepath);
 
-        nr::dune2::ImageSet tileset;
-        nr::load(tileset, cmd_state->inputFilepath);
+        nr::dune2::ImageSet images;
+        for (auto &&source: cmd_state->sources) {
+            nr::load(images, source);
+        }
 
         std::for_each(
-            tileset.begin(),
-            tileset.end(),
+            images.begin(),
+            images.end(),
             [&, i = 0u](const auto &tile) mutable {
                 const auto filename = format("{}.bmp", ++i);
                 nr::dune2::BMP bmp(tile.getWidth(), tile.getHeight());
