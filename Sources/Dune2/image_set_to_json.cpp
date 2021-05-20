@@ -11,7 +11,7 @@ using rapidjson::MemoryPoolAllocator;
 namespace {
 Value tile_to_JSON(
     MemoryPoolAllocator<> &allocator,
-    const ImageSet::Image &tile
+    const Image &tile
 ) {
     using base64 = cppcodec::base64_rfc4648;
     Value value(rapidjson::kObjectType);

@@ -5,7 +5,7 @@ namespace nr::dune2 {
 IconSet::Icon::Surface::Surface(
     const std::size_t col,
     const std::size_t row,
-    std::vector<ImageSet::Image> &&tiles)
+    std::vector<Image> &&tiles)
     : column_{col}
     , row_{row}
     , tiles_{std::move(tiles)} {
@@ -50,12 +50,12 @@ IconSet::Icon::getRowCount() const {
 IconSet::Icon::Surface
 IconSet::Icon::getSurface(const ImageSet &tileset) const {
     using namespace std::placeholders;
-    std::vector<ImageSet::Image> tiles;
+    std::vector<Image> tiles;
     std::transform(
         tiles_.begin(),
         tiles_.end(),
         std::back_inserter(tiles),
-        std::bind(&ImageSet::getTile, tileset, _1)
+        std::bind(&ImageSet::getImage, tileset, _1)
     );
     return Surface(columns_, rows_, std::move(tiles));
 }

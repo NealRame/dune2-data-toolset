@@ -14,16 +14,16 @@ decode(const rapidjson::Value &value) {
 }
 
 namespace {
-ImageSet::Image load_tile_from_JSON(const rapidjson::Value &value) {
+Image load_tile_from_JSON(const rapidjson::Value &value) {
     unsigned int width{value.FindMember("w")->value.GetUint()};
     unsigned int height{value.FindMember("h")->value.GetUint()};
     std::string data(decode(value.FindMember("data")->value));
 
     if (value.HasMember("remap")) {
         std::string remap(decode(value.FindMember("remap")->value));
-        return ImageSet::Image(width, height, data, remap);
+        return Image(width, height, data, remap);
     }
-    return ImageSet::Image(width, height, data);
+    return Image(width, height, data);
 }
 }
 

@@ -108,7 +108,7 @@ add_custom_command(
     "Importing Units tiles"
   COMMAND
     $<TARGET_FILE:RCToolkit>
-      tileset create -o units-images.json ${DUNE2_UNITS_FILES}
+      images create -o units-images.json ${DUNE2_UNITS_FILES}
 )
 
 # Terrain tileset
@@ -121,7 +121,7 @@ add_custom_command(
     "Importing Terrain tiles"
   COMMAND
     $<TARGET_FILE:RCToolkit>
-      tileset create -o terrain-images.json ${DUNE2_TERRAIN_FILES}
+      images create -o terrain-images.json ${DUNE2_TERRAIN_FILES}
 )
 
 # Miscellaneous
@@ -134,7 +134,7 @@ add_custom_command(
     "Importing Misc tiles"
   COMMAND
     $<TARGET_FILE:RCToolkit>
-      tileset create -o misc-images.json ${DUNE2_MISC_FILES}
+      images create -o misc-images.json ${DUNE2_MISC_FILES}
 )
 
 add_custom_target(${PROJECT_NAME} ALL

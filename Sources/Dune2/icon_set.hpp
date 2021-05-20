@@ -13,14 +13,14 @@ class IconSet {
 public:
     class Icon {
     public:
-        using TileList = std::vector<ImageSet::Image>;
+        using TileList = std::vector<Image>;
         using TileIndexList = std::vector<std::size_t>;
 
     public:
         class Surface : public nr::dune2::Surface {
             std::size_t column_;
             std::size_t row_;
-            std::vector<ImageSet::Image> tiles_;
+            std::vector<Image> tiles_;
 
         public:
             Surface(std::size_t col, std::size_t row, TileList &&);

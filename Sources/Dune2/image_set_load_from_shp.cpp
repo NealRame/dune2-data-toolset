@@ -50,7 +50,7 @@ shp_read_frame_offsets(std::istream &input, SHPVersion version) {
     return offsets;
 }
 
-ImageSet::Image
+Image
 shp_read_tile(std::istream &input, std::istream::pos_type pos) {
     input.seekg(pos);
 
@@ -96,7 +96,7 @@ shp_read_tile(std::istream &input, std::istream::pos_type pos) {
         data.insert(data.end(), count, value);
     }
 
-    return ImageSet::Image(width, height, std::move(data), std::move(data_remap_table));
+    return Image(width, height, std::move(data), std::move(data_remap_table));
 }
 
 } // namespace
