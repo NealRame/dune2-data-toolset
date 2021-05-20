@@ -17,8 +17,8 @@ struct Surface {
     /// ### method nr::dune2::Surface.getPixel
     /// Return the pixel value from given coordinates.
     /// #### Parameters
-    /// * `size_t x`- the horizontal coordinate.
-    /// * `size_t y`- the vertical coordinate.
+    /// - `size_t x`- the horizontal coordinate.
+    /// - `size_t y`- the vertical coordinate.
     /// #### Return
     /// `size_t` - a color index for a 256 colors Palette.
     virtual size_t getPixel(size_t x, size_t y) const = 0;

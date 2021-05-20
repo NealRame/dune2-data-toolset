@@ -1,4 +1,4 @@
-#include "iconset.hpp"
+#include "icon_set.hpp"
 #include "io.hpp"
 
 #include <fstream>
@@ -7,7 +7,7 @@ namespace nr::dune2 {
 
 namespace {
 
-Iconset::Icon
+IconSet::Icon
 icon_shape_from_index(std::size_t icon_index, std::vector<std::size_t> &&tile_indexes) {
     const auto size = tile_indexes.size();
     std::tuple<size_t, size_t> shape;
@@ -80,12 +80,12 @@ icon_shape_from_index(std::size_t icon_index, std::vector<std::size_t> &&tile_in
     const auto [columns, rows] = shape;
 
     assert(columns*rows <= size);
-    return Iconset::Icon(columns, rows, std::move(tile_indexes));
+    return IconSet::Icon(columns, rows, std::move(tile_indexes));
 }
 } // namespace
 
 void
-Iconset::loadFromMAP(const std::string &map_path) {
+IconSet::loadFromMAP(const std::filesystem::path &map_path) {
     std::fstream map_input(map_path, std::ios::binary|std::ios::in);
     std::vector<std::size_t> tile_indexes;
 

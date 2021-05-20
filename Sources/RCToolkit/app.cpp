@@ -1,36 +1,80 @@
 #include "app.hpp"
 
-AppState::Resource::Resource(const fs::path &filepath) 
-    : filepath_{filepath} {
-    if (fs::is_regular_file(filepath_)) {
-        rc_.deserialize(filepath_);
+#include <fmt/format.h>
+
+#include <regex>
+
+namespace nr {
+namespace fs = std::filesystem;
+
+bool
+filepathMatch(
+    const fs::path &filepath,
+    const std::string extension
+) {
+    const auto ext = filepath.extension().string();
+    return std::regex_match(ext, std::regex(
+        fmt::format(R"(^\{}$)", extension),
+        std::regex_constants::icase
+    ));
+}
+
+template <>
+void
+load<dune2::Palette>(
+    dune2::Palette &palette,
+    const std::filesystem::path &source
+) {
+    if (filepathMatch(source, ".pal")) {
+        palette.loadFromPAL(source);
+    } else if (filepathMatch(source, ".json")) {
+        palette.loadFromJSON(source);
+    } else {
+        throw CLI::Error(
+            "Unsupported file",
+            fmt::format("Unsupported file type: '{}'", source.extension().string()),
+            CLI::ExitCodes::InvalidError
+        );
     }
 }
 
-AppState::Resource::~Resource() {
-    rc_.serialize(filepath_);
+template <>
+void
+load<dune2::ImageSet>(
+    dune2::ImageSet &tileset,
+    const std::filesystem::path &source
+) {
+    if (filepathMatch(source, ".icn")) {
+        tileset.loadFromICN(source);
+    } else if (filepathMatch(source, ".shp")) {
+        tileset.loadFromSHP(source);
+    } else if (filepathMatch(source, ".json")) {
+        tileset.loadFromJSON(source);
+    } else {
+        throw CLI::Error(
+            "Unsupported file",
+            fmt::format("Unsupported file type: '{}'", source.extension().string()),
+            CLI::ExitCodes::InvalidError
+        );
+    }
 }
 
-nr::dune2::Resource *
-AppState::Resource::operator->() {
-    return &rc_;
+template <>
+void load<dune2::IconSet>(
+    dune2::IconSet &iconset,
+    const std::filesystem::path &source
+) {
+    if (filepathMatch(source, ".map")) {
+        iconset.loadFromMAP(source);
+    } else if (filepathMatch(source, ".json")) {
+        iconset.loadFromJSON(source);
+    } else {
+        throw CLI::Error(
+            "Unsupported file",
+            fmt::format("Unsupported file type: '{}'", source.extension().string()),
+            CLI::ExitCodes::InvalidError
+        );
+    }
 }
 
-nr::dune2::Resource &
-AppState::Resource::operator*() {
-    return rc_;
-}
-
-const nr::dune2::Resource *
-AppState::Resource::operator->() const {
-    return &rc_;
-}
-
-const nr::dune2::Resource &
-AppState::Resource::operator*() const {
-    return rc_;
-}
-
-AppState::Resource AppState::resource() {
-    return Resource(dune2RCPath);
-}
+} // namespace nr

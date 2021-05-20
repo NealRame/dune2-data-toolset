@@ -1,4 +1,5 @@
 #include "palette.hpp"
+#include "bmp.hpp"
 #include "io.hpp"
 
 #include <fstream>
@@ -34,7 +35,9 @@ Palette::loadFromPAL(const fs::path &filepath) {
 }
 
 void
-Palette::loadFromJSON(const rapidjson::Value &json) {
+Palette::loadFromJSON(const std::filesystem::path &filepath) {
+    std::ifstream input(filepath);
+    const auto json = io::loadJSON(input);
     std::transform(
         json.Begin(),
         json.End(),
@@ -49,12 +52,14 @@ Palette::loadFromJSON(const rapidjson::Value &json) {
     );
 }
 
-rapidjson::Value
-Palette::toJSON(rapidjson::Document &doc) const {
+rapidjson::Document
+Palette::toJSON() const {
     using rapidjson::Value;
 
-    Value value(rapidjson::kArrayType);
+    rapidjson::Document doc;
+
     auto &allocator = doc.GetAllocator();
+    auto &value = doc.SetArray();
 
     for (auto &&color: colors_) {
         value.PushBack(
@@ -65,7 +70,23 @@ Palette::toJSON(rapidjson::Document &doc) const {
             allocator
         );
     }
-    return value;
+    return doc;
+}
+
+BMP 
+Palette::toBMP() const {
+    const auto color_per_row = 8;
+    const auto color_size = 32;
+    const auto width = color_size*color_per_row;
+    const auto height = color_size*colors_.size()/color_per_row;
+
+    BMP bmp(width, height);
+    for (auto i = 0; i < colors_.size(); ++i) {
+        const auto row = i/color_per_row;
+        const auto col = i%color_per_row;
+        bmp.fillRect(col*color_size, row*color_size, color_size, color_size, colors_.at(i));
+    }
+    return bmp;
 }
 
 } // namespace nr::dune2

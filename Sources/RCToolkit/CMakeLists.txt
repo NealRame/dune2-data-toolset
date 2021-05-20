@@ -6,12 +6,9 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
   app.cpp
   app.hpp
   main.cpp
-  commands/export.cpp
-  commands/extract.cpp
   commands/palette.cpp
-  commands/soundset.cpp
-  commands/iconset.cpp
-  commands/tileset.cpp
+  commands/icons.cpp
+  commands/images.cpp
 )
 target_compile_features(${PROJECT_NAME}
   PRIVATE cxx_std_17

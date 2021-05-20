@@ -2,6 +2,8 @@
 
 #include <Dune2/bswap.hpp>
 
+#include <rapidjson/document.h>
+
 #include <array>
 #include <functional>
 #include <istream>
@@ -86,6 +88,9 @@ std::vector<uint8_t> readLCWData(std::istream &, size_t deflated_size, size_t in
 std::string readAll(std::istream &);
 std::string readString(std::istream &);
 std::string readString(std::istream &, size_t);
+
+
+rapidjson::Document loadJSON(std::istream &);
 
 class OPosOffsetGuard {
     std::ostream &output_;

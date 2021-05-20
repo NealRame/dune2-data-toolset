@@ -46,6 +46,18 @@ readString(std::istream &in, size_t size) {
     in.read(std::data(s), size);
     return s;
 }
+
+
+rapidjson::Document
+loadJSON(std::istream &in) {
+    const auto src = nr::dune2::io::readAll(in);
+
+    rapidjson::Document doc;
+    doc.Parse(src.c_str());
+
+    return doc;
+}
+
 } // namespace nr::dune2::io
 
 std::ostream &

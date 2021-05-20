@@ -1,4 +1,4 @@
-#include "tileset.hpp"
+#include "image_set.hpp"
 #include "io.hpp"
 
 #include <stdexcept>
@@ -12,24 +12,24 @@ namespace {
 
 struct ICNInfo {
     /// #### attribute `width`
-    /// The pixels width of a Tile.
+    /// The pixels width of a Image.
     size_t width;
 
     /// #### attribute `height`
-    /// The pixels height of a Tile.
+    /// The pixels height of a Image.
     size_t height;
 
     /// #### attribute `bitPerPixels`
     /// The number of bits used to store one pixel.
     size_t bitPerPixels;
 
-    /// #### method `Tile.getTileSize`
+    /// #### method `Image.getTileSize`
     /// ##### Return
     /// `size_t` - the number of bytes used to store a tile.
     size_t getTileSize() const
     { return (width*height*bitPerPixels)/8; }
 
-    /// #### method `Tile.getPaletteSize`
+    /// #### method `Image.getPaletteSize`
     /// ##### Return
     /// `size_t` - the number of colors used in a tile.
     size_t getPaletteSize() const
@@ -118,7 +118,7 @@ read_rtbl_chunk(std::ifstream &input, const ICNInfo &info) {
 } // namespace
 
 void
-Tileset::loadFromICN(const fs::path &icn_path) {
+ImageSet::loadFromICN(const fs::path &icn_path) {
     using namespace std::literals;
     std::ifstream input;
 
@@ -158,7 +158,7 @@ Tileset::loadFromICN(const fs::path &icn_path) {
                 }
             }
 
-            return Tile(info.width, info.height, std::move(data));
+            return Image(info.width, info.height, std::move(data));
         }
     );
 }

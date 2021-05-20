@@ -1,4 +1,4 @@
-#include "tileset.hpp"
+#include "image_set.hpp"
 #include "io.hpp"
 
 #include <stdexcept>
@@ -8,7 +8,7 @@
 namespace nr::dune2 {
 
 size_t
-Tileset::Tile::getPixel(size_t x, size_t y) const {
+ImageSet::Image::getPixel(size_t x, size_t y) const {
     assert(x < getWidth());
     assert(y < getHeight());
 
@@ -21,37 +21,37 @@ Tileset::Tile::getPixel(size_t x, size_t y) const {
 }
 
 const std::string &
-Tileset::Tile::getData() const {
+ImageSet::Image::getData() const {
     return data_;
 }
 
 const std::string &
-Tileset::Tile::getRemapTableData() const {
+ImageSet::Image::getRemapTableData() const {
     return dataRemapTable_;
 }
 
 bool
-Tileset::Tile::hasRemapTable() const {
+ImageSet::Image::hasRemapTable() const {
     return dataRemapTable_.size() > 0;
 }
 
 size_t
-Tileset::getTileCount() const {
+ImageSet::getTileCount() const {
     return tiles_.size();
 }
 
-const Tileset::Tile &
-Tileset::getTile(size_t tile_index) const {
+const ImageSet::Image &
+ImageSet::getTile(size_t tile_index) const {
     return tiles_[tile_index];
 }
 
-Tileset::TileIterator
-Tileset::begin() const {
+ImageSet::TileIterator
+ImageSet::begin() const {
     return tiles_.begin();
 }
 
-Tileset::TileIterator
-Tileset::end() const {
+ImageSet::TileIterator
+ImageSet::end() const {
     return tiles_.end();
 }
 

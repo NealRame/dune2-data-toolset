@@ -1,6 +1,9 @@
-#include "tileset.hpp"
+#include "image_set.hpp"
+#include "io.hpp"
 
 #include <cppcodec/base64_rfc4648.hpp>
+
+#include <fstream>
 
 namespace nr::dune2 {
 
@@ -11,25 +14,26 @@ decode(const rapidjson::Value &value) {
 }
 
 namespace {
-Tileset::Tile load_tile_from_JSON(const rapidjson::Value &value) {
+ImageSet::Image load_tile_from_JSON(const rapidjson::Value &value) {
     unsigned int width{value.FindMember("w")->value.GetUint()};
     unsigned int height{value.FindMember("h")->value.GetUint()};
     std::string data(decode(value.FindMember("data")->value));
 
     if (value.HasMember("remap")) {
         std::string remap(decode(value.FindMember("remap")->value));
-        return Tileset::Tile(width, height, data, remap);
+        return ImageSet::Image(width, height, data, remap);
     }
-    return Tileset::Tile(width, height, data);
+    return ImageSet::Image(width, height, data);
 }
 }
 
 void
-Tileset::loadFromJSON(const rapidjson::Value &value) {
-    tiles_.clear();
+ImageSet::loadFromJSON(const std::filesystem::path &filepath) {
+    std::ifstream input(filepath);
+    const auto json = io::loadJSON(input);
     std::transform(
-        value.Begin(),
-        value.End(),
+        json.Begin(),
+        json.End(),
         std::back_inserter(tiles_),
         load_tile_from_JSON
     );

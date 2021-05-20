@@ -9,25 +9,25 @@
 #include <rapidjson/document.h>
 
 namespace nr::dune2 {
-class Tileset {
+class ImageSet {
 public:
-    /// ### class nr::dune2::Tileset::Tile
-    /// A tile loaded from an `.icn` file.
-    /// `nr::dune2::Tileset::Tile` implements `nr::dune2::Surface`.
+    /// ### class nr::dune2::ImageSet::Image
+    /// An image loaded from an `.icn` or an `.shp` file.
+    /// `nr::dune2::ImageSet::Image` implements `nr::dune2::Surface`.
     /// See [`nr::dune2::Surface`](/docs/nr/dune2/surface) for more details.
-    class Tile: public Surface {
-        friend class Tileset;
+    class Image: public Surface {
+        friend class ImageSet;
 
     public:
         template <typename T>
-        Tile(size_t width, size_t height, T &&data)
+        Image(size_t width, size_t height, T &&data)
             : width_{width}
             , height_{height}
             , data_{std::forward<T>(data)} {
         }
 
         template <typename T, typename U>
-        Tile(size_t width, size_t height, T &&data, U &&data_remap_table)
+        Image(size_t width, size_t height, T &&data, U &&data_remap_table)
             : width_{width}
             , height_{height}
             , data_{std::forward<T>(data)}
@@ -35,35 +35,35 @@ public:
         }
 
     public:
-        /// ### method `nr::dune2::Tileset::Tile.getWidth`
+        /// ### method `nr::dune2::ImageSet::Image.getWidth`
         /// See [`nr::dune2::Surface.getWidth`](/docs/nr/dune2/surface#getWidth)
         /// for more details.
         virtual size_t getWidth() const override
         { return width_; }
 
-        /// ### method `nr::dune2::Tileset::Tile.getHeight`
+        /// ### method `nr::dune2::ImageSet::Image.getHeight`
         /// See [`nr::dune2::Surface.getHeight`](/docs/nr/dune2/surface#getHeight)
         /// for more details.
         virtual size_t getHeight() const override
         { return height_; }
 
-        /// ### method `nr::dune2::Tileset::Tile.getPixel`
+        /// ### method `nr::dune2::ImageSet::Image.getPixel`
         /// See [`nr::dune2::Surface.getPixel`](/docs/nr/dune2/surface#getPixel)
         /// for more details.
         virtual size_t getPixel(size_t, size_t) const override;
 
-        /// ### method `nr::dune2::Tileset::Tile::getData`
+        /// ### method `nr::dune2::ImageSet::Image::getData`
         /// #### Return
         /// - `const std::string &` - a reference on the tile's raw data.
         const std::string &getData() const;
 
-        /// ### method `nr::dune2::Tileset::Tile::getRemapTableData`
+        /// ### method `nr::dune2::ImageSet::Image::getRemapTableData`
         /// #### Return
         /// - `const std::string &` - a reference on the tile's remap table raw
         /// data.
         const std::string &getRemapTableData() const;
 
-        /// ### method `nr::dune2::Tileset::Tile::hasRemapTable`
+        /// ### method `nr::dune2::ImageSet::Image::hasRemapTable`
         /// #### Return
         /// - `bool` - `true` if tile has a remap table.
         bool hasRemapTable() const;
@@ -75,74 +75,73 @@ public:
         std::string dataRemapTable_;
     };
 
-    /// ### class `nr::dune2::Tileset::TileIterator`
+    /// ### class `nr::dune2::ImageSet::TileIterator`
     /// An input iterator to iterate throught tiles.
-    using TileIterator = std::vector<Tile>::const_iterator;
+    using TileIterator = std::vector<Image>::const_iterator;
 
 public:
-    /// ### method `nr::dune2::Tileset::loadFromICN`
+    /// ### method `nr::dune2::ImageSet::loadFromICN`
     /// Load tiles from given `.icn` files.
     /// #### Parameters
-    /// * `const std::filesystem::path &icn_path` - a path to `*.icn` file
-    void loadFromICN(const std::filesystem::path &icn_path);
+    /// - `const std::filesystem::path &icn_path` - a path to `*.icn` file
+    void loadFromICN(const std::filesystem::path &);
 
-    /// ### method `nr::dune2::Tileset::loadFromSHP`
+    /// ### method `nr::dune2::ImageSet::loadFromSHP`
     /// Load tiles from given `.shp` files.
     /// #### Parameters
-    /// * `const std::filesystem::path &shp_path` - a path to `*.shp` file
-    void loadFromSHP(const std::filesystem::path &shp_path);
+    /// - `const std::filesystem::path &shp_path` - a path to `*.shp` file
+    void loadFromSHP(const std::filesystem::path &);
 
-    /// ### method `nr::dune2::Tileset::loadFromJSON`
+    /// ### method `nr::dune2::ImageSet::loadFromJSON`
     /// Load tiles from the given _JSON_ value.
     /// #### Parameters
-    /// * `const rapidjson::Value &` - json data
-    void loadFromJSON(const rapidjson::Value &);
-
-
-public:
-    /// ### method `nr::dune2::Tileset::toJSON`
-    /// Transform this tileset to _JSON_ value
-    /// #### Parameters
-    /// * `rapidjson::Document &`
-    rapidjson::Value toJSON(rapidjson::Document &);
+    /// - `const std::filesystem::path &` - a path to `*.json` file
+    void loadFromJSON(const std::filesystem::path &);
 
 public:
-    /// ### method `nr::dune2::Tileset.getName`
+    /// ### method `nr::dune2::ImageSet::toJSON`
+    /// Transform this tileset to _JSON_ document
     /// #### Return
-    /// `const std::string &` - this `Tileset` name.
+    /// `rapidjson::Document` - a json document
+    rapidjson::Document toJSON() const;
+
+public:
+    /// ### method `nr::dune2::ImageSet.getName`
+    /// #### Return
+    /// `const std::string &` - this `ImageSet` name.
     const std::string &getName() const
     { return name_; }
 
-    /// ### method nr::dune2::Tileset.setName`
+    /// ### method nr::dune2::ImageSet.setName`
     /// #### Parameters
-    /// * `const std::string &name` - set the name of the tileset
+    /// - `const std::string &name` - set the name of the tileset
     /// #### Return
-    /// `Tileset &` - this `Tileset`.
-    Tileset &setName(const std::string &name) {
+    /// `ImageSet &` - this `ImageSet`.
+    ImageSet &setName(const std::string &name) {
         name_ = name;
         return *this;
     }
 
-    /// ### method `nr::dune2::Tileset.getTileCount`
+    /// ### method `nr::dune2::ImageSet.getTileCount`
     /// #### Return
     /// `size_t` - the number of tiles.
     size_t getTileCount() const;
 
-    /// ### method `nr::dune2::Tileset.getTile`
+    /// ### method `nr::dune2::ImageSet.getTile`
     /// #### Parameters
-    /// * `tile_index` - the tile index.
+    /// - `tile_index` - the tile index.
     /// #### Return
-    /// `Tileset::Tile` - a tile _tiles[tile_index]_.
-    const Tile &getTile(size_t tile_index) const;
+    /// `ImageSet::Image` - a tile _tiles[tile_index]_.
+    const Image &getTile(size_t tile_index) const;
 
-    /// ### method `nr::dune2::Tileset.tilesBegin`
+    /// ### method `nr::dune2::ImageSet.tilesBegin`
     /// #### Return
-    /// `Tileset::TileIterator` - an iterator on the first tile.
+    /// `ImageSet::TileIterator` - an iterator on the first tile.
     TileIterator begin() const;
 
-    /// ### method `nr::dune2::Tileset.tilesEnd`
+    /// ### method `nr::dune2::ImageSet.tilesEnd`
     /// #### Return
-    /// `Tileset::TileIterator` - an iterator on the last tile.
+    /// `ImageSet::TileIterator` - an iterator on the last tile.
     TileIterator end() const;
 
 public:
@@ -153,6 +152,6 @@ public:
 
 private:
     std::string name_;
-    std::vector<Tile> tiles_;
+    std::vector<Image> tiles_;
 };
 } // namespace nr::dune2

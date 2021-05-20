@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace nr::dune2 {
+class BMP;
 class Palette {
 public:
     struct Color {
@@ -22,10 +23,11 @@ public:
 
 public:
     void loadFromPAL(const std::filesystem::path &);
-    void loadFromJSON(const rapidjson::Value &);
+    void loadFromJSON(const std::filesystem::path &);
 
 public:
-    rapidjson::Value toJSON(rapidjson::Document &) const;
+    rapidjson::Document toJSON() const;
+    BMP toBMP() const;
 
 public:
     size_t size() const

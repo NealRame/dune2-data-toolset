@@ -1,4 +1,4 @@
-#include "tileset.hpp"
+#include "image_set.hpp"
 
 #include <cppcodec/base64_rfc4648.hpp>
 
@@ -11,7 +11,7 @@ using rapidjson::MemoryPoolAllocator;
 namespace {
 Value tile_to_JSON(
     MemoryPoolAllocator<> &allocator,
-    const Tileset::Tile &tile
+    const ImageSet::Image &tile
 ) {
     using base64 = cppcodec::base64_rfc4648;
     Value value(rapidjson::kObjectType);
@@ -40,13 +40,14 @@ Value tile_to_JSON(
 
 }
 
-rapidjson::Value
-Tileset::toJSON(rapidjson::Document &doc) {
-    Value tiles(rapidjson::kArrayType);
+rapidjson::Document
+ImageSet::toJSON() const {
+    rapidjson::Document doc;
     auto &allocator = doc.GetAllocator();
+    auto &tiles = doc.SetArray();
     for (const auto &tile: tiles_) {
         tiles.PushBack(tile_to_JSON(allocator, tile), allocator);
     }
-    return tiles;
+    return doc;
 }
 } // namespace nr::dune2

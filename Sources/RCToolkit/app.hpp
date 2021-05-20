@@ -1,36 +1,36 @@
 #pragma once
 
-#include <Dune2/resources.hpp>
+#include <Dune2/io.hpp>
+#include <Dune2/palette.hpp>
+#include <Dune2/icon_set.hpp>
+#include <Dune2/image_set.hpp>
 
 #include <CLI/CLI.hpp>
 
-#include <filesystem>
+#include <rapidjson/document.h>
 
-namespace fs = std::filesystem;
+#include <filesystem>
 
 using CLI::App;
 
+namespace nr {
+
 struct AppState {
-    class Resource {
-        std::filesystem::path filepath_;
-        nr::dune2::Resource rc_;
-
-    public:
-        Resource(const fs::path &);
-        ~Resource();
-
-        Resource(const Resource &) = delete;
-        Resource &operator=(const Resource &) = delete;
-
-        nr::dune2::Resource *operator->();
-        const nr::dune2::Resource *operator->() const;
-
-        nr::dune2::Resource &operator*();
-        const nr::dune2::Resource &operator*() const;
-    };
-
     unsigned int verbose{0};
-    fs::path dune2RCPath{fs::current_path()/"dune2.rc"};
-
-    Resource resource();
 };
+
+bool filepathMatch(const std::filesystem::path &, const std::string extension);
+
+template <typename T>
+void load(T &data, const std::filesystem::path &);
+
+template <>
+void load<dune2::Palette>(dune2::Palette &, const std::filesystem::path &);
+
+template <>
+void load<dune2::ImageSet>(dune2::ImageSet &, const std::filesystem::path &);
+
+template <>
+void load<dune2::IconSet>(dune2::IconSet &, const std::filesystem::path &);
+
+} // namespace nr

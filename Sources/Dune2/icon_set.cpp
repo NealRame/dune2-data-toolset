@@ -1,28 +1,28 @@
-#include "iconset.hpp"
+#include "icon_set.hpp"
 
 namespace nr::dune2 {
 
-Iconset::Icon::Surface::Surface(
+IconSet::Icon::Surface::Surface(
     const std::size_t col,
     const std::size_t row,
-    std::vector<Tileset::Tile> &&tiles)
+    std::vector<ImageSet::Image> &&tiles)
     : column_{col}
     , row_{row}
     , tiles_{std::move(tiles)} {
 }
 
 size_t
-Iconset::Icon::Surface::getWidth() const {
+IconSet::Icon::Surface::getWidth() const {
     return column_*tiles_.front().getWidth();
 }
 
 size_t
-Iconset::Icon::Surface::getHeight() const {
+IconSet::Icon::Surface::getHeight() const {
     return row_*tiles_.front().getHeight();
 }
 
 size_t
-Iconset::Icon::Surface::getPixel(size_t x, size_t y) const {
+IconSet::Icon::Surface::getPixel(size_t x, size_t y) const {
     assert((x < getWidth()) && (y < getHeight()));
 
     const auto w = tiles_.front().getWidth();
@@ -38,24 +38,24 @@ Iconset::Icon::Surface::getPixel(size_t x, size_t y) const {
 }
 
 size_t
-Iconset::Icon::getColumnCount() const {
+IconSet::Icon::getColumnCount() const {
     return columns_;
 }
 
 size_t
-Iconset::Icon::getRowCount() const {
+IconSet::Icon::getRowCount() const {
     return rows_;
 }
 
-Iconset::Icon::Surface
-Iconset::Icon::getSurface(const Tileset &tileset) const {
+IconSet::Icon::Surface
+IconSet::Icon::getSurface(const ImageSet &tileset) const {
     using namespace std::placeholders;
-    std::vector<Tileset::Tile> tiles;
+    std::vector<ImageSet::Image> tiles;
     std::transform(
         tiles_.begin(),
         tiles_.end(),
         std::back_inserter(tiles),
-        std::bind(&Tileset::getTile, tileset, _1)
+        std::bind(&ImageSet::getTile, tileset, _1)
     );
     return Surface(columns_, rows_, std::move(tiles));
 }

@@ -1,94 +1,147 @@
 #include <app.hpp>
 
 #include <Dune2/bmp.hpp>
+#include <Dune2/palette.hpp>
 
 #include <fmt/format.h>
 
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/prettywriter.h>
+
+#include <filesystem>
+
 namespace {
+namespace fs = std::filesystem;
+
+using nr::AppState;
+
+using rapidjson::OStreamWrapper;
+
+using PrettyWriter = rapidjson::PrettyWriter<OStreamWrapper>;
+using Writer = rapidjson::Writer<OStreamWrapper>;
 
 CLI::App_p
-create_import_command(AppState &app_state) {
+create_create_command(AppState &app_state) {
     struct CmdState {
         bool force{false};
-        std::string name;
-        fs::path dune2InputFilepath;
+        bool pretty{false};
+        fs::path inputFilepath;
+        fs::path outputFilepath{"palette.json"};
     };
 
     auto cmd = std::make_shared<App>();
     auto cmd_state = std::make_shared<CmdState>();
 
-    cmd->name("import");
-    cmd->description("Import a Dune2 palette to resources");
+    cmd->name("create");
+    cmd->description("Convert a Dune2 palette into a JSON file");
+
     cmd->add_flag_function(
         "-f,--force",
         [cmd_state](auto count) {
             cmd_state->force = (count != 0);
         },
-        "Force overwrite if a palette with same name already exist in resources"
+        "Force overwrite if palette already exists"
     );
+
+    cmd->add_flag_function(
+        "-p,--pretty",
+        [cmd_state](auto count) {
+            cmd_state->pretty = (count != 0);
+        },
+        "Enable pretty output"
+    );
+
+    cmd->add_option_function<fs::path>(
+        "-o,--output-file",
+        [cmd_state](const fs::path &outputFilepath) {
+            cmd_state->outputFilepath = outputFilepath;
+        },
+        "Specify the output file"
+    );
+
     cmd->add_option_function<fs::path>(
         "PAL_FILE_PATH",
         [cmd_state](const fs::path &filepath) {
-            cmd_state->dune2InputFilepath = filepath;
+            cmd_state->inputFilepath = filepath;
         },
         "Path to Dune2 .pal file"
     )->check(CLI::ExistingFile)->required();
+
     cmd->callback([cmd, cmd_state, &app_state] {
-        auto rc = app_state.resource();
-        const auto name = cmd_state->name.empty()
-            ? cmd_state->dune2InputFilepath.stem().string()
-            : cmd_state->name;
+        nr::dune2::Palette pal;
 
-        if (rc->hasPalette() && !cmd_state->force) {
-            throw CLI::Error(
-                "PaletteOverwrite",
-                fmt::format("palette already exist!")
-            );
+        pal.loadFromPAL(cmd_state->inputFilepath);
+
+        std::ofstream ofs(cmd_state->outputFilepath);
+        OStreamWrapper osw(ofs);
+
+        const auto json = pal.toJSON();
+
+        if (cmd_state->pretty) {
+            PrettyWriter writer(osw);
+            json.Accept(writer);
+        } else {
+            Writer writer(osw);
+            json.Accept(writer);
         }
-
-        rc->importPalette(cmd_state->dune2InputFilepath);
     });
     return cmd;
 }
 
-
 CLI::App_p
-create_export_command(AppState &app_state) {
+create_extract_command(AppState &app_state) {
+    struct CmdState {
+        bool force{false};
+        bool pretty{false};
+        fs::path inputFilepath;
+        fs::path outputFilepath{"palette.bmp"};
+    };
+
     auto cmd = std::make_shared<App>();
+    auto cmd_state = std::make_shared<CmdState>();
 
-    cmd->name("export");
-    cmd->description("Export a palette to a bmp file");
-    cmd->add_option_function<std::string>(
-        "PALETTE_NAME",
-        [&](const std::string &name) {
-            const auto rc = app_state.resource();
-            const auto palette = rc->getPalette();
-
-            nr::dune2::BMP bmp(256, 256);
-            for (auto i = 0; i < 256; ++i) {
-                const auto row = i/16;
-                const auto col = i%16;
-                bmp.fillRect(col*16, row*16, 16, 16, palette.at(i));
-            }
-
-            bmp.store(fmt::format("{}.bmp", name));
-        }
+    cmd->name("extract");
+    cmd->description("Convert a Dune2 palette into a BMP file");
+    cmd->add_flag_function(
+        "-f,--force",
+        [cmd_state](auto count) {
+            cmd_state->force = (count != 0);
+        },
+        "Force overwrite if palette already exists"
     );
-
+    cmd->add_option_function<fs::path>(
+        "-o,--output-file",
+        [cmd_state](const fs::path &outputFilepath) {
+            cmd_state->outputFilepath = outputFilepath;
+        },
+        "Specify the output file"
+    );
+    cmd->add_option_function<fs::path>(
+        "PAL_FILE_PATH",
+        [cmd_state](const fs::path &filepath) {
+            cmd_state->inputFilepath = filepath;
+        },
+        "Path to Dune2 .pal or .json palette file"
+    )->check(CLI::ExistingFile)->required();
+    cmd->callback([cmd, cmd_state, &app_state] {
+        nr::dune2::Palette pal;
+        nr::load(pal, cmd_state->inputFilepath);
+        pal.toBMP().store(cmd_state->outputFilepath);
+    });
     return cmd;
 }
 
 } // namespace
 
 CLI::App_p
-createPaletteCommands(AppState &app_state) {
+createPaletteCommands(nr::AppState &app_state) {
     auto cmd = std::make_shared<App>();
 
     cmd->name("palette");
     cmd->description("Palette commands");
     cmd->require_subcommand(1);
-    cmd->add_subcommand(create_export_command(app_state));
-    cmd->add_subcommand(create_import_command(app_state));
+    cmd->add_subcommand(create_create_command(app_state));
+    cmd->add_subcommand(create_extract_command(app_state));
 
     return cmd;
 }

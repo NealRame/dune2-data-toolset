@@ -1,4 +1,4 @@
-#include "tileset.hpp"
+#include "image_set.hpp"
 #include "io.hpp"
 
 #include <stdexcept>
@@ -50,7 +50,7 @@ shp_read_frame_offsets(std::istream &input, SHPVersion version) {
     return offsets;
 }
 
-Tileset::Tile
+ImageSet::Image
 shp_read_tile(std::istream &input, std::istream::pos_type pos) {
     input.seekg(pos);
 
@@ -96,13 +96,13 @@ shp_read_tile(std::istream &input, std::istream::pos_type pos) {
         data.insert(data.end(), count, value);
     }
 
-    return Tileset::Tile(width, height, std::move(data), std::move(data_remap_table));
+    return ImageSet::Image(width, height, std::move(data), std::move(data_remap_table));
 }
 
 } // namespace
 
 void
-Tileset::loadFromSHP(const fs::path &shp_path) {
+ImageSet::loadFromSHP(const fs::path &shp_path) {
     std::ifstream input;
 
     input.open(shp_path, std::ios::binary);
