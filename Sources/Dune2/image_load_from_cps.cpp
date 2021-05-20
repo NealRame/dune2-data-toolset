@@ -20,7 +20,7 @@ Image::loadFromCPS(const fs::path &cps_path) {
     const auto inflated_size = io::readLEInteger<4>(input);
     const auto palette_size = io::readLEInteger<2>(input);
 
-    if (compression_type != 0 || compression_type != 4) {
+    if (compression_type != 0 && compression_type != 4) {
         throw std::invalid_argument("corrupted file");
     }
 
