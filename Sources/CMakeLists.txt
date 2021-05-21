@@ -75,7 +75,7 @@ add_custom_command(
 # Extract GPX file
 add_custom_command(
   OUTPUT
-    ${DUNE2_TILES_FILES}
+    ${DUNE2_DATA_SOURCES}
   DEPENDS
     PAKExtract
     ${DUNE2_DUNE_PAK_FILES}
@@ -87,75 +87,73 @@ add_custom_command(
 
 # Palette
 add_custom_command(
-  OUTPUT "palette.json"
+  OUTPUT ${DUNE2_PALETTE_OUTPUT_FILE}
   DEPENDS
-    ${DUNE2_PAL_FILE}
+    ${DUNE2_PALETTE_SOURCE}
     RCToolkit
   COMMENT
     "Create palette"
   COMMAND
     $<TARGET_FILE:RCToolkit>
-      palette create ${DUNE2_PAL_FILE}
+      palette create -o ${DUNE2_PALETTE_OUTPUT_FILE} ${DUNE2_PALETTE_SOURCE}
 )
 
-# Units tileset
+# Miscellaneous image set
 add_custom_command(
-  OUTPUT "units-images.json"
+  OUTPUT ${DUNE2_IMAGES_MISC_OUTPUT_FILE}
   DEPENDS
-    ${DUNE2_UNITS_FILES}
-    RCToolkit
-  COMMENT
-    "Importing Units tiles"
-  COMMAND
-    $<TARGET_FILE:RCToolkit>
-      images create -o units-images.json ${DUNE2_UNITS_FILES}
-)
-
-# Terrain tileset
-add_custom_command(
-  OUTPUT "terrain-images.json"
-  DEPENDS
-    ${DUNE2_TERRAIN_FILES}
-    RCToolkit
-  COMMENT
-    "Importing Terrain tiles"
-  COMMAND
-    $<TARGET_FILE:RCToolkit>
-      images create -o terrain-images.json ${DUNE2_TERRAIN_FILES}
-)
-
-# Miscellaneous
-add_custom_command(
-  OUTPUT "misc-images.json"
-  DEPENDS
-    ${DUNE2_MISC_FILES}
+    ${DUNE2_IMAGES_MISC_SOURCES}
     RCToolkit
   COMMENT
     "Importing Misc tiles"
   COMMAND
     $<TARGET_FILE:RCToolkit>
-      images create -o misc-images.json ${DUNE2_MISC_FILES}
+      images create -o ${DUNE2_IMAGES_MISC_OUTPUT_FILE} ${DUNE2_IMAGES_MISC_SOURCES}
 )
 
-add_custom_target(${PROJECT_NAME} ALL
+# Terrain image set
+add_custom_command(
+  OUTPUT ${DUNE2_IMAGES_TERRAIN_OUTPUT_FILE}
   DEPENDS
-    "palette.json"
-    "units-images.json"
-    "terrain-images.json"
-    "misc-images.json"
+    ${DUNE2_IMAGES_TERRAIN_SOURCES}
+    RCToolkit
+  COMMENT
+    "Importing Terrain images"
+  COMMAND
+    $<TARGET_FILE:RCToolkit>
+      images create -o ${DUNE2_IMAGES_TERRAIN_OUTPUT_FILE} ${DUNE2_IMAGES_TERRAIN_SOURCES}
 )
 
-foreach(DATA_JSON palette units-images terrain-images misc-images)
+# Units image set
+add_custom_command(
+  OUTPUT ${DUNE2_IMAGES_UNITS_OUTPUT_FILE}
+  DEPENDS
+    ${DUNE2_IMAGES_UNITS_SOURCES}
+    RCToolkit
+  COMMENT
+    "Importing Units images"
+  COMMAND
+    $<TARGET_FILE:RCToolkit>
+      images create -o ${DUNE2_IMAGES_UNITS_OUTPUT_FILE} ${DUNE2_IMAGES_UNITS_SOURCES}
+)
+
+add_custom_target(${PROJECT_NAME}
+  ALL
+  DEPENDS
+    ${DUNE2_DATA_OUTPUT_FILES}
+)
+
+foreach(DATA_JSON ${DUNE2_DATA_OUTPUT_FILES})
   add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMENT
-      "Deflate ${DATA_JSON}.json"
+      "Deflate ${DATA_JSON}"
     COMMAND
-      gzip --force "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json"
+      gzip --force "${DATA_JSON}"
   )
   install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.json.gz"
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/${DATA_JSON}.gz"
     DESTINATION public/assets
   )
 endforeach()
