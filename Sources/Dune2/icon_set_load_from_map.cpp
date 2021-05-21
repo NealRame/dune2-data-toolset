@@ -7,104 +7,149 @@ namespace nr::dune2 {
 
 namespace {
 
-IconSet::Icon
-icon_shape_from_index(std::size_t icon_index, std::vector<std::size_t> &&tile_indexes) {
-    const auto size = tile_indexes.size();
-    std::tuple<size_t, size_t> shape;
+using ImageIndexList = std::vector<std::size_t>;
+using ImageIndexListIterator = ImageIndexList::const_iterator;
+using ImageIndexRangeList = std::vector<std::tuple<
+        ImageIndexListIterator,
+        ImageIndexListIterator
+    >
+>;
+
+using ShapeList = std::vector<std::tuple<
+        size_t,
+        size_t
+    >
+>;
+
+void
+icons_from_index(
+    std::size_t icon_index,
+    ImageIndexListIterator first,
+    ImageIndexListIterator last,
+    std::vector<IconSet::Icon> &icons
+) {
+    ShapeList shapes;
 
     switch (icon_index) {
     case 0:
     case 1:
-    case 2:
     case 3:
-        shape = std::make_tuple(3, 2);
+        shapes = ShapeList( 3, std::make_tuple(2, 1));
+        break;
+    case 2:
+        shapes = ShapeList{ std::make_tuple( 3, 2) };
         break;
     case 4:
-        shape = std::make_tuple(4, 2);
+        shapes = ShapeList{ std::make_tuple( 8, 1) };
         break;
     case 5:
-        shape = std::make_tuple(15, 5);
+        shapes = ShapeList{ 
+            std::make_tuple( 1, 1),
+            std::make_tuple(12, 1),
+            std::make_tuple(62, 1),
+        };
         break;
     case 6:
-        shape = std::make_tuple(4, 4);
+        shapes = ShapeList{ std::make_tuple( 4, 4) };
         break;
     case 8:
-        shape = std::make_tuple(27, 3);
+        shapes = ShapeList{
+            std::make_tuple( 1, 1),
+            std::make_tuple(16, 1),
+            std::make_tuple(16, 1),
+            std::make_tuple(16, 1),
+            std::make_tuple(16, 1),
+            std::make_tuple(16, 1),
+        };
         break;
     case 10:
-        shape = std::make_tuple(3, 12);
+        shapes = ShapeList( 4, std::make_tuple(3, 3));
         break;
     case 11:
-        shape = std::make_tuple(2, 12);
+    case 25:
+        shapes = ShapeList( 6, std::make_tuple(2, 2));
         break;
     case 12:
     case 13:
-        shape = std::make_tuple(3, 16);
+        shapes = ShapeList( 8, std::make_tuple(3, 2));
         break;
     case 14:
     case 15:
     case 16:
     case 17:
     case 18:
-        shape = std::make_tuple(2, 8);
+    case 24:
+        shapes = ShapeList( 4, std::make_tuple(2, 2));
         break;
     case 19:
-        shape = std::make_tuple(3, 30);
+        shapes = ShapeList(10, std::make_tuple(3, 3));
         break;
     case 20:
     case 21:
-        shape = std::make_tuple(3, 20);
+        shapes = ShapeList(10, std::make_tuple(3, 2));
         break;
     case 22:
     case 23:
-        shape = std::make_tuple(1, 10);
-        break;
-    case 24:
-        shape = std::make_tuple(2, 8);
-        break;
-    case 25:
-        shape = std::make_tuple(2, 12);
+        shapes = { std::make_tuple(10, 1) };
         break;
     default:
-        shape = std::make_tuple(size, 1);
+        shapes = { std::make_tuple(std::distance(first, last), 1) };
         break;
     }
 
-    // std::cout
-    //     << "ICON#" << index
-    //     << " size=" << size
-    //     << " w=" << std::get<0>(wh)
-    //     << " h=" << std::get<1>(wh)
-    // << std::endl;
+    std::for_each(
+        shapes.begin(),
+        shapes.end(),
+        [&](const auto shape) mutable {
+            const auto [columns, rows] = shape;
+            const auto count = columns*rows;
 
-    const auto [columns, rows] = shape;
+            assert(first + count <= last);
+            icons.emplace_back(IconSet::Icon(
+                columns, rows,
+                ImageIndexList(first, first + count)
+            ));
 
-    assert(columns*rows <= size);
-    return IconSet::Icon(columns, rows, std::move(tile_indexes));
+            first += count;
+        }
+    );
 }
 } // namespace
 
 void
 IconSet::loadFromMAP(const std::filesystem::path &map_path) {
     std::fstream map_input(map_path, std::ios::binary|std::ios::in);
-    std::vector<std::size_t> tile_indexes;
+    ImageIndexList indexes;
 
     while (!map_input.eof()) {
-        tile_indexes.emplace_back(io::readLEInteger<2>(map_input));
+        indexes.emplace_back(io::readLEInteger<2>(map_input));
     }
 
-    const auto count = tile_indexes[0];
-
+    ImageIndexRangeList ranges;
     std::transform(
-        tile_indexes.begin() + 1,
-        tile_indexes.begin() + count,
-        tile_indexes.begin() + 2,
-        std::back_inserter(icons_),
-        [&, icon_index = 0u](auto first, auto last) mutable {
-            last = last > 0 ? last : tile_indexes.size();
-            return icon_shape_from_index(
+        indexes.begin() + 1,
+        indexes.begin() + indexes[0],
+        indexes.begin() + 2,
+        std::back_inserter(ranges),
+        [&](auto first, auto last) {
+            last = last > 0 ? last : indexes.size();
+            return std::make_tuple(
+                indexes.begin() + first,
+                indexes.begin() + last
+            );
+        }
+    );
+
+    std::for_each(
+        ranges.begin(),
+        ranges.end(),
+        [&, icon_index = 0u](const auto &range) mutable {
+            const auto [first, last] = range;
+            icons_from_index(
                 icon_index++,
-                std::vector(tile_indexes.begin() + first, tile_indexes.begin() + last)
+                first,
+                last,
+                icons_
             );
         }
     );
