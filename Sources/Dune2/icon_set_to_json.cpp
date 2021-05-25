@@ -7,7 +7,7 @@ using rapidjson::Value;
 using rapidjson::MemoryPoolAllocator;
 
 namespace {
-Value 
+Value
 icon_to_JSON(
     MemoryPoolAllocator<> &allocator,
     const IconSet::Icon &icon
