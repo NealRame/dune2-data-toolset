@@ -137,6 +137,19 @@ add_custom_command(
       images create -o ${DUNE2_IMAGES_UNITS_OUTPUT_FILE} ${DUNE2_IMAGES_UNITS_SOURCES}
 )
 
+# Tiles mapping
+add_custom_command(
+  OUTPUT ${DUNE2_TILES_OUTPUT_FILE}
+  DEPENDS
+    ${DUNE2_TILES_MAPPING_SOURCES}
+    RCToolkit
+  COMMENT
+    "Importing Tiles mapping"
+  COMMAND
+    $<TARGET_FILE:RCToolkit>
+      icons create -o ${DUNE2_TILES_OUTPUT_FILE} ${DUNE2_TILES_TERRAIN_SOURCES}
+)
+
 add_custom_target(${PROJECT_NAME}
   ALL
   DEPENDS
