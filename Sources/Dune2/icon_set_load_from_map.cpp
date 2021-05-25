@@ -31,37 +31,6 @@ icons_from_index(
     ShapeList shapes;
 
     switch (icon_index) {
-    case 0:
-    case 1:
-    case 3:
-        shapes = ShapeList( 3, std::make_tuple(2, 1));
-        break;
-    case 2:
-        shapes = ShapeList{ std::make_tuple( 3, 2) };
-        break;
-    case 4:
-        shapes = ShapeList{ std::make_tuple( 8, 1) };
-        break;
-    case 5:
-        shapes = ShapeList{ 
-            std::make_tuple( 1, 1),
-            std::make_tuple(12, 1),
-            std::make_tuple(62, 1),
-        };
-        break;
-    case 6:
-        shapes = ShapeList{ std::make_tuple( 4, 4) };
-        break;
-    case 8:
-        shapes = ShapeList{
-            std::make_tuple( 1, 1),
-            std::make_tuple(16, 1),
-            std::make_tuple(16, 1),
-            std::make_tuple(16, 1),
-            std::make_tuple(16, 1),
-            std::make_tuple(16, 1),
-        };
-        break;
     case 10:
         shapes = ShapeList( 4, std::make_tuple(3, 3));
         break;
@@ -88,12 +57,8 @@ icons_from_index(
     case 21:
         shapes = ShapeList(10, std::make_tuple(3, 2));
         break;
-    case 22:
-    case 23:
-        shapes = { std::make_tuple(10, 1) };
-        break;
     default:
-        shapes = { std::make_tuple(std::distance(first, last), 1) };
+        shapes = ShapeList(std::distance(first, last), std::make_tuple(1, 1));
         break;
     }
 
