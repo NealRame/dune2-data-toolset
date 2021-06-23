@@ -18,11 +18,11 @@ icon_to_JSON(
     }
 
     Value shape(rapidjson::kObjectType);
-    shape.AddMember("width", Value((unsigned int)icon.getColumnCount()), allocator);
-    shape.AddMember("height", Value((unsigned int)icon.getRowCount()), allocator);
+    shape.AddMember("columns", Value((unsigned int)icon.getColumnCount()), allocator);
+    shape.AddMember("rows", Value((unsigned int)icon.getRowCount()), allocator);
 
     Value value(rapidjson::kObjectType);
-    value.AddMember("size", shape, allocator);
+    value.AddMember("shape", shape, allocator);
     value.AddMember("indexes", images, allocator);
 
     return value;
